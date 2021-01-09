@@ -1,4 +1,4 @@
-local ADDON_VERSION = "1.0"
+local ADDON_VERSION = "1.1"
 local ADDON_AUTHOR = "Tom Cumbow"
 local ADDON_NAME = "AutoFight-Generic"
 
