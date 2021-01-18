@@ -67,6 +67,13 @@ local function UpdateLowestGroupHealth()
 end
 
 local MajorSorcery
+local MajorResolve
+local FamiliarActive
+local FamiliarAOEActive
+local TwilightActive
+local DamageShieldActive
+local CrystalFragmentsProc
+local EnergyOverloadActive
 local function UpdateBuffs()
 	MajorSorcery = false
 	local numBuffs = GetNumBuffs("player")
@@ -75,6 +82,20 @@ local function UpdateBuffs()
 			local name, _, endTime, _, _, _, _, _, _, _, id, _ = GetUnitBuffInfo("player", i)
 			if name=="Major Sorcery" then
 				MajorSorcery = true
+			elseif name=="Major Resolve" then
+				MajorResolve = true
+			-- if name=="Conjured Ward" or name=="Empowered Ward" then
+			-- 	DamageShieldActive = true
+			-- elseif name=="Summon Volatile Familiar" and id==23316 then
+			-- 	FamiliarActive = true
+			-- elseif name=="Volatile Pulse" or (name=="Summon Volatile Familiar" and id==88933) then
+			-- 	FamiliarAOEActive = true
+			-- elseif name=="Summon Twilight Matriarch" then
+			-- 	TwilightActive = true
+			-- elseif name=="Crystal Fragments Proc" then
+			-- 	CrystalFragmentsProc = true
+			-- elseif name=="Energy Overload" or name=="Power Overload" then
+			-- 	EnergyOverloadActive = true
 			end
 		end
 	end
