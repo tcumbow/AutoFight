@@ -104,7 +104,7 @@ end
 local function AutoFightMain()
 	if not IsUnitInCombat('player') then return end
 	if IsReticleHidden() or IsUnitSwimming('player') then return end
-
+	if ETA > GetGameTimeMilliseconds() then return end
 	UpdateLowestGroupHealth()
 	MyHealth, MyMaxHealth = GetUnitPower('player', POWERTYPE_HEALTH)
 	MyHealthPercent = MyHealth/MyMaxHealth
@@ -115,19 +115,30 @@ local function AutoFightMain()
 	UpdateBuffs()
 
 	-- Core Healing
-	if LowestGroupHealthPercent < 0.40 and MyMagicka > 3500 then
+	if not TwilightActive and MyMagicka > 3500 then
+		LibPixelControl.SetIndOnFor(LibPixelControl.VK_1,50)
+		ETA = GetGameTimeMilliseconds() + 2000
+	elseif LowestGroupHealthPercent < 0.40 and TwilightActive and MyMagicka > 3500 then
 		LibPixelControl.SetIndOnFor(LibPixelControl.VK_1,50)
 	elseif LowestGroupHealthPercentWithoutRegen < 0.90 and MyMagicka > 3500 then
-		LibPixelControl.SetIndOnFor(LibPixelControl.VK_2,50)
+		LibPixelControl.SetIndOnFor(LibPixelControl.VK_4,50)
 
 	-- Proactive Healing
-	elseif LowestGroupHealthPercent < 0.60 and MyMagicka > 20000 then
+	elseif LowestGroupHealthPercent < 0.60 and TwilightActive and MyMagicka > 20000 then
 		LibPixelControl.SetIndOnFor(LibPixelControl.VK_1,50)
-	elseif LowestGroupHealthPercent < 0.80 and MyMagickaPercent > 0.90 then
+	elseif LowestGroupHealthPercent < 0.80 and TwilightActive and MyMagickaPercent > 0.90 then
 		LibPixelControl.SetIndOnFor(LibPixelControl.VK_1,50)
 
 	-- Buffs
-
+	-- elseif CrystalFragmentsProc and GetUnitReaction('reticleover') == UNIT_REACTION_HOSTILE and MyMagicka > 3500 then
+	-- 	LibPixelControl.SetIndOnFor(LibPixelControl.VK_4,50)
+	-- elseif not MajorResolve and MyMagicka > 30000 then
+	-- 	LibPixelControl.SetIndOnFor(LibPixelControl.VK_3,50)
+	elseif not FamiliarActive and MyMagicka > 20000 then
+		LibPixelControl.SetIndOnFor(LibPixelControl.VK_2,50)
+		ETA = GetGameTimeMilliseconds() + 2000
+	elseif FamiliarActive and not FamiliarAOEActive and MyMagicka > 20000 then
+		LibPixelControl.SetIndOnFor(LibPixelControl.VK_2,50)
 
 	-- Light Attacks
 	elseif DoesUnitExist('reticleover') and GetUnitReaction('reticleover') == UNIT_REACTION_HOSTILE and not IsUnitDead('reticleover') and not IsBlockActive() then
