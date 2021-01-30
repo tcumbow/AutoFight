@@ -27,20 +27,19 @@ end
 
 local function TargetShouldBeTaunted()
 	if (not DoesUnitExist('reticleover') or IsUnitDead('reticleover') or GetUnitType('reticleover') == 1 or GetUnitReaction('reticleover') ~= UNIT_REACTION_HOSTILE or GetUnitDifficulty("reticleover") < 3) then
-		local numAuras = GetNumBuffs('reticleover')
-		if (numAuras > 0) then
-			for i = 1, numAuras do
-				local name, _, _, _, _, _, _, _, _, _, _, _ = GetUnitBuffInfo('reticleover', i)
-				if name=="Taunt" then
-					return false
-				end
-			end
-		end
-		return true
-	else
 		return false
 	end
 
+	local numAuras = GetNumBuffs('reticleover')
+	if (numAuras > 0) then
+		for i = 1, numAuras do
+			local name, _, _, _, _, _, _, _, _, _, _, _ = GetUnitBuffInfo('reticleover', i)
+			if name=="Taunt" then
+				return false
+			end
+		end
+	end
+	return true
 end
 
 local LowestGroupHealthPercentWithoutRegen
