@@ -83,8 +83,14 @@ local function UpdateLowestGroupHealth()
 	end
 end
 
+local FamiliarActive
+local FamiliarAOEActive
+local TwilightActive
 local MajorSorcery
 local function UpdateBuffs()
+	FamiliarActive = false
+	FamiliarAOEActive = false
+	TwilightActive = false
 	MajorSorcery = false
 	local numBuffs = GetNumBuffs("player")
 	if numBuffs > 0 then
@@ -92,6 +98,12 @@ local function UpdateBuffs()
 			local name, _, endTime, _, _, _, _, _, _, _, id, _ = GetUnitBuffInfo("player", i)
 			if name=="Major Sorcery" then
 				MajorSorcery = true
+			elseif name=="Summon Volatile Familiar" and id==23316 then
+				FamiliarActive = true
+			elseif name=="Volatile Pulse" or (name=="Summon Volatile Familiar" and id==88933) then
+				FamiliarAOEActive = true
+			elseif name=="Summon Twilight Matriarch" then
+				TwilightActive = true
 			end
 		end
 	end
@@ -108,8 +120,7 @@ local function AutoFightMain()
 	MyMagickaPercent = MyMagicka/MyMaxMagicka
 	MyStamina, MyMaxStamina = GetUnitPower('player', POWERTYPE_STAMINA)
 	MyStaminaPercent = MyStamina/MyMaxStamina
-	UpdateBuffs()
-
+	
 	-- Core Healing
 	if LowestGroupHealthPercent < 0.40 and MyMagicka > 3500 then
 		LibPixelControl.SetIndOnFor(LibPixelControl.VK_2,50)
