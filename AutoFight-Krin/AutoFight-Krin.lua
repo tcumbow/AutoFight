@@ -115,8 +115,9 @@ local function AutoFightMain()
 	if LowestGroupHealthPercent < 0.40 and MyMagicka > 3500 then
 		LibPixelControl.SetIndOnFor(LibPixelControl.VK_2,50)
 
-	-- Buffs
-
+	-- Taunting
+	elseif TargetShouldBeTaunted() and MyMagicka > 3500 then
+		LibPixelControl.SetIndOnFor(LibPixelControl.VK_3,50)
 
 	-- Light Attacks
 	elseif DoesUnitExist('reticleover') and GetUnitReaction('reticleover') == UNIT_REACTION_HOSTILE and not IsUnitDead('reticleover') and not IsBlockActive() then
