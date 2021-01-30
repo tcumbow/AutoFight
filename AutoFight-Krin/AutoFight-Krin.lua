@@ -95,15 +95,7 @@ local function AutoFightMain()
 
 	-- Core Healing
 	if LowestGroupHealthPercent < 0.40 and MyMagicka > 3500 then
-		LibPixelControl.SetIndOnFor(LibPixelControl.VK_1,50)
-	elseif LowestGroupHealthPercentWithoutRegen < 0.90 and MyMagicka > 3500 then
 		LibPixelControl.SetIndOnFor(LibPixelControl.VK_2,50)
-
-	-- Proactive Healing
-	elseif LowestGroupHealthPercent < 0.60 and MyMagicka > 20000 then
-		LibPixelControl.SetIndOnFor(LibPixelControl.VK_1,50)
-	elseif LowestGroupHealthPercent < 0.80 and MyMagickaPercent > 0.90 then
-		LibPixelControl.SetIndOnFor(LibPixelControl.VK_1,50)
 
 	-- Buffs
 
