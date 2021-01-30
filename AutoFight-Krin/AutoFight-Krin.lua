@@ -98,10 +98,10 @@ local function UpdateBuffs()
 			local name, _, endTime, _, _, _, _, _, _, _, id, _ = GetUnitBuffInfo("player", i)
 			if name=="Major Sorcery" then
 				MajorSorcery = true
-			elseif name=="Summon Volatile Familiar" and id==23316 then
+			elseif name=="Summon Unstable Clannfear" then
 				FamiliarActive = true
-			elseif name=="Volatile Pulse" or (name=="Summon Volatile Familiar" and id==88933) then
-				FamiliarAOEActive = true
+			-- elseif name=="Volatile Pulse" or (name=="Summon Volatile Familiar" and id==88933) then
+			-- 	FamiliarAOEActive = true
 			elseif name=="Summon Twilight Matriarch" then
 				TwilightActive = true
 			end
@@ -132,8 +132,8 @@ local function AutoFightMain()
 		LibPixelControl.SetIndOnFor(LibPixelControl.VK_3,50)
 
 	-- -- Familiar
-	-- elseif not FamiliarActive and MyMagickaPercent > 0.50 then
-	-- 	LibPixelControl.SetIndOnFor(LibPixelControl.VK_5,50)
+	elseif not FamiliarActive and MyMagickaPercent > 0.50 then
+		LibPixelControl.SetIndOnFor(LibPixelControl.VK_5,50)
 	-- elseif not FamiliarAOEActive and FamiliarActive and MyMagickaPercent > 0.50 then
 	-- 	LibPixelControl.SetIndOnFor(LibPixelControl.VK_5,50)
 
