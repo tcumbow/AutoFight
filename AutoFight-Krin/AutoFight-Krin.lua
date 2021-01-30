@@ -122,12 +122,20 @@ local function AutoFightMain()
 	MyStaminaPercent = MyStamina/MyMaxStamina
 	
 	-- Core Healing
-	if LowestGroupHealthPercent < 0.40 and MyMagicka > 3500 then
+	if not TwilightActive and MyMagicka > 7000 then
+		LibPixelControl.SetIndOnFor(LibPixelControl.VK_2,50)
+	elseif LowestGroupHealthPercent < 0.40 and MyMagicka > 3500 then
 		LibPixelControl.SetIndOnFor(LibPixelControl.VK_2,50)
 
 	-- Taunting
 	elseif TargetShouldBeTaunted() and MyMagicka > 3500 then
 		LibPixelControl.SetIndOnFor(LibPixelControl.VK_3,50)
+
+	-- Familiar
+	elseif not FamiliarActive and MyMagickaPercent > 0.50 then
+		LibPixelControl.SetIndOnFor(LibPixelControl.VK_5,50)
+	elseif not FamiliarAOEActive and FamiliarActive and MyMagickaPercent > 0.50 then
+		LibPixelControl.SetIndOnFor(LibPixelControl.VK_5,50)
 
 	-- Light Attacks
 	elseif DoesUnitExist('reticleover') and GetUnitReaction('reticleover') == UNIT_REACTION_HOSTILE and not IsUnitDead('reticleover') and not IsBlockActive() then
