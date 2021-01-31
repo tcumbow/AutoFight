@@ -86,12 +86,13 @@
         "String"
     ],
     "cSpell.words": [
+        "Nevira",
         "Sorc"
     ],
     "emeraldwalk.runonsave": {
         "commands": [
             {
-                "cmd": "copyrobo .\\AutoFight-Nevira A:\\AutoFight-Nevira /mir"
+                "cmd": "robocopy .\\AutoFight-Nevira J:\\AutoFight-Nevira /mir"
             }
         ]
     }

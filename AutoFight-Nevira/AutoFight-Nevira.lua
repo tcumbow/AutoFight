@@ -83,8 +83,14 @@ local function UpdateLowestGroupHealth()
 	end
 end
 
+local FamiliarActive
+local FamiliarAOEActive
+local TwilightActive
 local MajorSorcery
 local function UpdateBuffs()
+	FamiliarActive = false
+	FamiliarAOEActive = false
+	TwilightActive = false
 	MajorSorcery = false
 	local numBuffs = GetNumBuffs("player")
 	if numBuffs > 0 then
@@ -92,6 +98,12 @@ local function UpdateBuffs()
 			local name, _, endTime, _, _, _, _, _, _, _, id, _ = GetUnitBuffInfo("player", i)
 			if name=="Major Sorcery" then
 				MajorSorcery = true
+			-- elseif name=="Summon Unstable Clannfear" then
+			-- 	FamiliarActive = true
+			-- elseif name=="Volatile Pulse" or (name=="Summon Volatile Familiar" and id==88933) then
+			-- 	FamiliarAOEActive = true
+			elseif name=="Summon Twilight Matriarch" then
+				TwilightActive = true
 			end
 		end
 	end
@@ -111,23 +123,20 @@ local function AutoFightMain()
 	UpdateBuffs()
 
 	-- Core Healing
-	if LowestGroupHealthPercent < 0.40 and MyMagicka > 3500 then
-		LibPixelControl.SetIndOnFor(LibPixelControl.VK_1,50)
-	elseif LowestGroupHealthPercentWithoutRegen < 0.90 and MyMagicka > 3500 then
-		LibPixelControl.SetIndOnFor(LibPixelControl.VK_2,50)
+	if not TwilightActive and MyMagicka > 7000 then
+		LibPixelControl.SetIndOnFor(LibPixelControl.VK_4,50)
+	elseif LowestGroupHealthPercent < 0.40 and MyMagicka > 3500 then
+		LibPixelControl.SetIndOnFor(LibPixelControl.VK_4,50)
 
-	-- Proactive Healing
-	elseif LowestGroupHealthPercent < 0.60 and MyMagicka > 20000 then
-		LibPixelControl.SetIndOnFor(LibPixelControl.VK_1,50)
-	elseif LowestGroupHealthPercent < 0.80 and MyMagickaPercent > 0.90 then
-		LibPixelControl.SetIndOnFor(LibPixelControl.VK_1,50)
-
-	-- Buffs
-
+	-- Familiar
+	-- elseif not FamiliarActive and MyMagickaPercent > 0.50 then
+	-- 	LibPixelControl.SetIndOnFor(LibPixelControl.VK_5,50)
+	-- elseif not FamiliarAOEActive and FamiliarActive and MyMagickaPercent > 0.50 then
+	-- 	LibPixelControl.SetIndOnFor(LibPixelControl.VK_5,50)
 
 	-- Light Attacks
-	elseif DoesUnitExist('reticleover') and GetUnitReaction('reticleover') == UNIT_REACTION_HOSTILE and not IsUnitDead('reticleover') and not IsBlockActive() then
-		LibPixelControl.SetIndOnFor(LibPixelControl.VM_BTN_LEFT,50)
+	-- elseif DoesUnitExist('reticleover') and GetUnitReaction('reticleover') == UNIT_REACTION_HOSTILE and not IsUnitDead('reticleover') and not IsBlockActive() then
+	-- 	LibPixelControl.SetIndOnFor(LibPixelControl.VM_BTN_LEFT,50)
 
 	end
 
