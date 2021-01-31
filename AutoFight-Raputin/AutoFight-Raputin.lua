@@ -132,7 +132,7 @@ local function AutoFightMain()
 	UpdateBuffs()
 
 	-- Core Healing
-	if not TwilightActive and MyMagicka > 3500 then
+	if not TwilightActive and LowestGroupHealthPercent < 0.80 and MyMagicka > 3500 then
 		LibPixelControl.SetIndOnFor(LibPixelControl.VK_1,50)
 		ETA = GetGameTimeMilliseconds() + 2000
 	elseif LowestGroupHealthPercent < 0.40 and TwilightActive and MyMagicka > 3500 then
