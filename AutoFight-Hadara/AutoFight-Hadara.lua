@@ -146,22 +146,24 @@ local function AutoFightMain()
 
 	-- Core Healing
 	if not TwilightActive and LowestGroupHealthPercent < 0.80 and MyMagicka > 3500 then
-		LibPixelControl.SetIndOnFor(LibPixelControl.VK_1,50)
+		LibPixelControl.SetIndOnFor(LibPixelControl.VK_4,50)
 		ETA = GetGameTimeMilliseconds() + 2000
 	elseif LowestGroupHealthPercent < 0.40 and TwilightActive and MyMagicka > 3500 then
-		LibPixelControl.SetIndOnFor(LibPixelControl.VK_1,50)
+		LibPixelControl.SetIndOnFor(LibPixelControl.VK_4,50)
 
 	-- Self Healing
 	elseif MyHealthPercent < 0.60 and TwilightActive and MyMagicka > 20000 then
-		LibPixelControl.SetIndOnFor(LibPixelControl.VK_1,50)
+		LibPixelControl.SetIndOnFor(LibPixelControl.VK_4,50)
 	elseif MyHealthPercent < 0.80 and TwilightActive and MyMagickaPercent > 0.90 then
-		LibPixelControl.SetIndOnFor(LibPixelControl.VK_1,50)
+		LibPixelControl.SetIndOnFor(LibPixelControl.VK_4,50)
 
 	-- Buffs
 	-- elseif CrystalFragmentsProc and GetUnitReaction('reticleover') == UNIT_REACTION_HOSTILE and MyMagicka > 3500 then
 	-- 	LibPixelControl.SetIndOnFor(LibPixelControl.VK_4,50)
 	-- elseif not MajorResolve and MyMagicka > 30000 then
 	-- 	LibPixelControl.SetIndOnFor(LibPixelControl.VK_3,50)
+	elseif not MajorSorcery and MyMagicka > 10000 then
+		LibPixelControl.SetIndOnFor(LibPixelControl.VK_3,50)
 	elseif not FamiliarActive and MyMagicka > 20000 then
 		LibPixelControl.SetIndOnFor(LibPixelControl.VK_2,50)
 		ETA = GetGameTimeMilliseconds() + 2000
