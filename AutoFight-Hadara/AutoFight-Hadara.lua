@@ -12,6 +12,14 @@ local MyStamina
 local MyMaxStamina
 local MyStaminaPercent
 
+local function DelayPress(idx, delay)
+	if idx then
+		zo_callLater(function() LibPixelControl.SetIndOnFor(idx,50) end, delay)
+	else
+		d("no index:"..tostring(idx))
+	end
+end
+
 local function UnitHasRegen(unitTag)
 	local numBuffs = GetNumBuffs(unitTag)
 	if numBuffs > 0 then
@@ -118,10 +126,15 @@ local function UpdateBuffs()
 	end
 end
 
+
+local ETA = 0
+local GameTimeMs = 0
 local function AutoFightMain()
 	if not IsUnitInCombat('player') then return end
 	if IsReticleHidden() or IsUnitSwimming('player') then return end
-	if ETA > GetGameTimeMilliseconds() then return end
+	GameTimeMs = GetGameTimeMilliseconds()
+	if ETA > GameTimeMs then return end
+
 	UpdateLowestGroupHealth()
 	MyHealth, MyMaxHealth = GetUnitPower('player', POWERTYPE_HEALTH)
 	MyHealthPercent = MyHealth/MyMaxHealth
@@ -155,9 +168,20 @@ local function AutoFightMain()
 	elseif FamiliarActive and not FamiliarAOEActive and MyMagicka > 20000 then
 		LibPixelControl.SetIndOnFor(LibPixelControl.VK_2,50)
 
-	-- Light Attacks
-	elseif DoesUnitExist('reticleover') and GetUnitReaction('reticleover') == UNIT_REACTION_HOSTILE and not IsUnitDead('reticleover') and not IsBlockActive() then
-		LibPixelControl.SetIndOnFor(LibPixelControl.VM_BTN_LEFT,50)
+	-- Weave Attack
+	elseif GetUnitReaction('reticleover') == UNIT_REACTION_HOSTILE and MyMagickaPercent > 0.40 then
+		LibPixelControl.SetIndOnFor(LibPixelControl.VM_BTN_LEFT,2200)
+		ETA = GameTimeMs + 2600
+		DelayPress(LibPixelControl.VK_1,1900)
+
+	-- Heavy Attack
+	elseif GetUnitReaction('reticleover') == UNIT_REACTION_HOSTILE then
+		LibPixelControl.SetIndOnFor(LibPixelControl.VM_BTN_LEFT,2200)
+		ETA = GameTimeMs + 2600
+
+	-- -- Light Attacks
+	-- elseif DoesUnitExist('reticleover') and GetUnitReaction('reticleover') == UNIT_REACTION_HOSTILE and not IsUnitDead('reticleover') and not IsBlockActive() then
+	-- 	LibPixelControl.SetIndOnFor(LibPixelControl.VM_BTN_LEFT,50)
 
 	end
 
