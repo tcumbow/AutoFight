@@ -86,12 +86,13 @@
         "String"
     ],
     "cSpell.words": [
-        "Sorc"
+        "Sorc",
+        "hadara"
     ],
     "emeraldwalk.runonsave": {
         "commands": [
             {
-                "cmd": "copyrobo .\\AutoFight-Generic A:\\AutoFight-Generic /mir"
+                "cmd": "robocopy .\\AutoFight-Hadara S:\\AutoFight-Hadara /mir"
             }
         ]
     }
