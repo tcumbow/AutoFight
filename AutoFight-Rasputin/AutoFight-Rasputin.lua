@@ -93,6 +93,9 @@ local CrystalFragmentsProc
 local EnergyOverloadActive
 local function UpdateBuffs()
 	MajorSorcery = false
+	FamiliarActive = false
+	FamiliarAOEActive = false
+	TwilightActive = false
 	local numBuffs = GetNumBuffs("player")
 	if numBuffs > 0 then
 		for i = 1, numBuffs do
@@ -103,12 +106,12 @@ local function UpdateBuffs()
 				MajorResolve = true
 			-- if name=="Conjured Ward" or name=="Empowered Ward" then
 			-- 	DamageShieldActive = true
-			-- elseif name=="Summon Volatile Familiar" and id==23316 then
-			-- 	FamiliarActive = true
-			-- elseif name=="Volatile Pulse" or (name=="Summon Volatile Familiar" and id==88933) then
-			-- 	FamiliarAOEActive = true
-			-- elseif name=="Summon Twilight Matriarch" then
-			-- 	TwilightActive = true
+			elseif name=="Summon Volatile Familiar" and id==23316 then
+				FamiliarActive = true
+			elseif name=="Volatile Pulse" or (name=="Summon Volatile Familiar" and id==88933) then
+				FamiliarAOEActive = true
+			elseif name=="Summon Twilight Matriarch" then
+				TwilightActive = true
 			-- elseif name=="Crystal Fragments Proc" then
 			-- 	CrystalFragmentsProc = true
 			-- elseif name=="Energy Overload" or name=="Power Overload" then
