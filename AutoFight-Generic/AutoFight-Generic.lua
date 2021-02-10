@@ -45,8 +45,9 @@ end
 local LowestGroupHealthPercentWithoutRegen
 local LowestGroupHealthPercentWithRegen
 local LowestGroupHealthPercent
+local GroupSize = 0
 local function UpdateLowestGroupHealth()
-	local GroupSize = GetGroupSize()
+	GroupSize = GetGroupSize()
 	LowestGroupHealthPercentWithoutRegen = 1.00
 	LowestGroupHealthPercentWithRegen = 1.00
 	LowestGroupHealthPercent = 1.00
