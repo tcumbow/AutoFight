@@ -122,6 +122,7 @@ local function UpdateBuffs()
 	end
 end
 
+local ETA = 0
 local function AutoFightMain()
 	if not IsUnitInCombat('player') then return end
 	if IsReticleHidden() or IsUnitSwimming('player') then return end
