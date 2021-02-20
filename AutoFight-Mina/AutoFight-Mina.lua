@@ -109,26 +109,22 @@ local function AutoFightMain()
 	MyMagickaPercent = MyMagicka/MyMaxMagicka
 	MyStamina, MyMaxStamina = GetUnitPower('player', POWERTYPE_STAMINA)
 	MyStaminaPercent = MyStamina/MyMaxStamina
-	UpdateBuffs()
+	-- UpdateBuffs()
 
 	-- Core Healing
 	if LowestGroupHealthPercent < 0.40 and MyMagicka > 3500 then
-		LibPixelControl.SetIndOnFor(LibPixelControl.VK_1,50)
-	elseif LowestGroupHealthPercentWithoutRegen < 0.90 and MyMagicka > 3500 then
 		LibPixelControl.SetIndOnFor(LibPixelControl.VK_2,50)
 
 	-- Proactive Healing
-	elseif LowestGroupHealthPercent < 0.60 and MyMagicka > 20000 then
-		LibPixelControl.SetIndOnFor(LibPixelControl.VK_1,50)
-	elseif LowestGroupHealthPercent < 0.80 and MyMagickaPercent > 0.90 then
-		LibPixelControl.SetIndOnFor(LibPixelControl.VK_1,50)
+	elseif MyHealthPercent < 0.60 and MyMagicka > 10000 then
+		LibPixelControl.SetIndOnFor(LibPixelControl.VK_2,50)
 
 	-- Buffs
 
 
 	-- Light Attacks
-	elseif DoesUnitExist('reticleover') and GetUnitReaction('reticleover') == UNIT_REACTION_HOSTILE and not IsUnitDead('reticleover') and not IsBlockActive() then
-		LibPixelControl.SetIndOnFor(LibPixelControl.VM_BTN_LEFT,50)
+	-- elseif DoesUnitExist('reticleover') and GetUnitReaction('reticleover') == UNIT_REACTION_HOSTILE and not IsUnitDead('reticleover') and not IsBlockActive() then
+	-- 	LibPixelControl.SetIndOnFor(LibPixelControl.VM_BTN_LEFT,50)
 
 	end
 
