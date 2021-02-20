@@ -1,6 +1,6 @@
 local ADDON_VERSION = "1.1"
 local ADDON_AUTHOR = "Tom Cumbow"
-local ADDON_NAME = "AutoFight-Generic"
+local ADDON_NAME = "AutoFight-Mina"
 
 local MyHealth
 local MyMaxHealth
@@ -137,7 +137,7 @@ end
 local function OnAddonLoaded(event, name)
 	if name == ADDON_NAME then
 		EVENT_MANAGER:UnregisterForEvent(ADDON_NAME, event)
-		if string.find(GetUnitName("player"),"Generic") then
+		if string.find(GetUnitName("player"),"Mina") then
 			EVENT_MANAGER:RegisterForUpdate(ADDON_NAME, 100, AutoFightMain)
 		end
 	end
