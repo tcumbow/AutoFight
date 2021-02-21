@@ -11,6 +11,9 @@ local MyMagickaPercent
 local MyStamina
 local MyMaxStamina
 local MyStaminaPercent
+local MyUltimate
+local MyMaxUltimate
+local MyUltimatePercent
 
 local function UnitHasRegen(unitTag)
 	local numBuffs = GetNumBuffs(unitTag)
@@ -40,6 +43,10 @@ local function TargetShouldBeTaunted()
 		end
 	end
 	return true
+end
+
+local function MyUltimateCost()
+	return GetAbilityCost(GetSlotBoundId(8))
 end
 
 local LowestGroupHealthPercentWithoutRegen
@@ -109,6 +116,8 @@ local function AutoFightMain()
 	MyMagickaPercent = MyMagicka/MyMaxMagicka
 	MyStamina, MyMaxStamina = GetUnitPower('player', POWERTYPE_STAMINA)
 	MyStaminaPercent = MyStamina/MyMaxStamina
+	MyUltimate, MyMaxUltimate = GetUnitPower('player', POWERTYPE_ULTIMATE)
+	MyUltimatePercent = MyUltimate/MyMaxUltimate
 	UpdateBuffs()
 
 	-- Core Healing
