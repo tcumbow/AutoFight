@@ -91,6 +91,19 @@ local function UpdateLowestGroupHealth()
 	end
 end
 
+local function BestialTransformationActive()
+	local numBuffs = GetNumBuffs("player")
+	if numBuffs > 0 then
+		for i = 1, numBuffs do
+			local name, _, endTime, _, _, _, _, _, _, _, id, _ = GetUnitBuffInfo("player", i)
+			if name=="Bestial Transformation" then
+				return true
+			end
+		end
+	end
+	return false
+end
+
 local MajorSorcery
 local function UpdateBuffs()
 	MajorSorcery = false
@@ -107,7 +120,7 @@ end
 
 local function AutoFightMain()
 	if not IsUnitInCombat('player') then return end
-	if IsReticleHidden() or IsUnitSwimming('player') then return end
+	if IsReticleHidden() or IsUnitSwimming('player') or BestialTransformationActive() then return end
 
 	UpdateLowestGroupHealth()
 	MyHealth, MyMaxHealth = GetUnitPower('player', POWERTYPE_HEALTH)
