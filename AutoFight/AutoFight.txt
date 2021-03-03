@@ -12,4 +12,4 @@
 ## Description: AutoFight-Generic
 ## DependsOn: LibPixelControl
 
-AutoFight-Generic.lua
+AutoFight.lua
