@@ -12,4 +12,4 @@
 ## Description: AutoFight-Hadara
 ## DependsOn: LibPixelControl
 
-AutoFight-Hadara.lua
+AutoFight.lua
