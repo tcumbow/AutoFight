@@ -1,5 +1,10 @@
+-- COMMON CODE
+
 local ADDON_VERSION = "1.1"
 local ADDON_AUTHOR = "Tom Cumbow"
+
+-- LEGACY CODE
+
 local ADDON_NAME = "AutoFight-Krin"
 
 local MyHealth
@@ -11,6 +16,9 @@ local MyMagickaPercent
 local MyStamina
 local MyMaxStamina
 local MyStaminaPercent
+local MyUltimate
+local MyMaxUltimate
+local MyUltimatePercent
 
 local function UnitHasRegen(unitTag)
 	local numBuffs = GetNumBuffs(unitTag)
@@ -42,11 +50,16 @@ local function TargetShouldBeTaunted()
 	return true
 end
 
+local function MyUltimateCost()
+	return GetAbilityCost(GetSlotBoundId(8))
+end
+
 local LowestGroupHealthPercentWithoutRegen
 local LowestGroupHealthPercentWithRegen
 local LowestGroupHealthPercent
+local GroupSize = 0
 local function UpdateLowestGroupHealth()
-	local GroupSize = GetGroupSize()
+	GroupSize = GetGroupSize()
 	LowestGroupHealthPercentWithoutRegen = 1.00
 	LowestGroupHealthPercentWithRegen = 1.00
 	LowestGroupHealthPercent = 1.00
@@ -83,6 +96,19 @@ local function UpdateLowestGroupHealth()
 	end
 end
 
+local function BestialTransformationActive()
+	local numBuffs = GetNumBuffs("player")
+	if numBuffs > 0 then
+		for i = 1, numBuffs do
+			local name, _, endTime, _, _, _, _, _, _, _, id, _ = GetUnitBuffInfo("player", i)
+			if name=="Bestial Transformation" then
+				return true
+			end
+		end
+	end
+	return false
+end
+
 local FamiliarActive
 local FamiliarAOEActive
 local TwilightActive
@@ -111,7 +137,7 @@ end
 
 local function AutoFightMain()
 	if not IsUnitInCombat('player') then return end
-	if IsReticleHidden() or IsUnitSwimming('player') then return end
+	if IsReticleHidden() or IsUnitSwimming('player') or BestialTransformationActive() then return end
 
 	UpdateLowestGroupHealth()
 	MyHealth, MyMaxHealth = GetUnitPower('player', POWERTYPE_HEALTH)
@@ -120,7 +146,10 @@ local function AutoFightMain()
 	MyMagickaPercent = MyMagicka/MyMaxMagicka
 	MyStamina, MyMaxStamina = GetUnitPower('player', POWERTYPE_STAMINA)
 	MyStaminaPercent = MyStamina/MyMaxStamina
-	
+	MyUltimate, MyMaxUltimate = GetUnitPower('player', POWERTYPE_ULTIMATE)
+	MyUltimatePercent = MyUltimate/MyMaxUltimate
+	UpdateBuffs()
+
 	-- Core Healing
 	if not TwilightActive and MyMagicka > 7000 then
 		LibPixelControl.SetIndOnFor(LibPixelControl.VK_2,50)

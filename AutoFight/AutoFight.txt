@@ -12,4 +12,4 @@
 ## Description: AutoFight-Krin
 ## DependsOn: LibPixelControl
 
-AutoFight-Krin.lua
+AutoFight.lua

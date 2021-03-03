@@ -92,7 +92,7 @@
     "emeraldwalk.runonsave": {
         "commands": [
             {
-                "cmd": "robocopy .\\AutoFight-Krin J:\\AutoFight-Krin /mir"
+                "cmd": "robocopy .\\AutoFight J:\\AutoFight-Krin /mir"
             }
         ]
     }
