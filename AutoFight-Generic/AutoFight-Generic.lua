@@ -1,5 +1,10 @@
+-- COMMON CODE
+
 local ADDON_VERSION = "1.1"
 local ADDON_AUTHOR = "Tom Cumbow"
+
+-- LEGACY CODE
+
 local ADDON_NAME = "AutoFight-Generic"
 
 local MyHealth
