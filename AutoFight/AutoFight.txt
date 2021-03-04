@@ -12,4 +12,4 @@
 ## Description: AutoFight-Rasputin
 ## DependsOn: LibPixelControl
 
-AutoFight-Rasputin.lua
+AutoFight.lua
