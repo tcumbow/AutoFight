@@ -1,25 +1,23 @@
--- COMMON CODE
+-- START COMMON CODE 01
 
-local ADDON_VERSION = "1.1"
-local ADDON_AUTHOR = "Tom Cumbow"
+-- start local copies
 
--- LEGACY CODE
+-- end local copies
 
-local ADDON_NAME = "AutoFight-Generic"
-
-local MyHealth
-local MyMaxHealth
-local MyHealthPercent
-local MyMagicka
-local MyMaxMagicka
-local MyMagickaPercent
-local MyStamina
-local MyMaxStamina
-local MyStaminaPercent
-local MyUltimate
-local MyMaxUltimate
-local MyUltimatePercent
-
+local function Health()
+	local MyHealth, MyMaxHealth = GetUnitPower('player', POWERTYPE_HEALTH)
+	return ((MyHealth/MyMaxHealth)*100)
+end
+local function Magicka()
+	local MyMagicka, MyMaxMagicka = GetUnitPower('player', POWERTYPE_MAGICKA)
+	return ((MyMagicka/MyMaxMagicka)*100)
+end
+local function Stamina()
+	local MyStamina, MyMaxStamina = GetUnitPower('player', POWERTYPE_STAMINA)
+	return ((MyStamina/MyMaxStamina)*100)
+end
+local function UltimateReady()
+end
 local function UnitHasRegen(unitTag)
 	local numBuffs = GetNumBuffs(unitTag)
 	if numBuffs > 0 then
@@ -32,25 +30,52 @@ local function UnitHasRegen(unitTag)
 	end
 	return false
 end
-
-local function TargetShouldBeTaunted()
-	if (not DoesUnitExist('reticleover') or IsUnitDead('reticleover') or GetUnitType('reticleover') == 1 or GetUnitReaction('reticleover') ~= UNIT_REACTION_HOSTILE or GetUnitDifficulty("reticleover") < 3) then
-		return false
-	end
-
+local function TargetIsHostileNpc()
+	return DoesUnitExist('reticleover') and not IsUnitDead('reticleover') and GetUnitType('reticleover') ~= 1 and GetUnitReaction('reticleover') == UNIT_REACTION_HOSTILE
+end
+local function TargetHas(buffName)
 	local numAuras = GetNumBuffs('reticleover')
 	if (numAuras > 0) then
 		for i = 1, numAuras do
 			local name, _, _, _, _, _, _, _, _, _, _, _ = GetUnitBuffInfo('reticleover', i)
-			if name=="Taunt" then
-				return false
+			if name==buffName then
+				return true
 			end
 		end
 	end
-	return true
+	return false
+end
+local function IHave(buffName)
+	local numAuras = GetNumBuffs('player')
+	if (numAuras > 0) then
+		for i = 1, numAuras do
+			local name, _, _, _, _, _, _, _, _, _, _, _ = GetUnitBuffInfo('reticleover', i)
+			if name==buffName then
+				return true
+			end
+		end
+	end
+	return false
+end
+local function TargetIsBoss()
+	return (GetUnitDifficulty("reticleover") < 3)
+end
+local function TargetCouldBeTaunted()
+	return (TargetIsHostileNpc() and TargetHas("Taunt"))
+end
+local function TargetShouldBeTaunted()
+	return (TargetCouldBeTaunted() and TargetIsBoss())
+end
+local function AutoFightShouldNotAct()
+	return (not IsUnitInCombat('player') or IsReticleHidden() or IsUnitSwimming('player') or IHave("Bestial Transformation"))
 end
 
-local function MyUltimateCost()
+-- END COMMON CODE 01
+
+-- START LEGACY CODE
+
+
+local function UltimateCost()
 	return GetAbilityCost(GetSlotBoundId(8))
 end
 
@@ -96,47 +121,7 @@ local function UpdateLowestGroupHealth()
 	end
 end
 
-local function BestialTransformationActive()
-	local numBuffs = GetNumBuffs("player")
-	if numBuffs > 0 then
-		for i = 1, numBuffs do
-			local name, _, endTime, _, _, _, _, _, _, _, id, _ = GetUnitBuffInfo("player", i)
-			if name=="Bestial Transformation" then
-				return true
-			end
-		end
-	end
-	return false
-end
-
-local MajorSorcery
-local function UpdateBuffs()
-	MajorSorcery = false
-	local numBuffs = GetNumBuffs("player")
-	if numBuffs > 0 then
-		for i = 1, numBuffs do
-			local name, _, endTime, _, _, _, _, _, _, _, id, _ = GetUnitBuffInfo("player", i)
-			if name=="Major Sorcery" then
-				MajorSorcery = true
-			end
-		end
-	end
-end
-
-local function AutoFightMain()
-	if not IsUnitInCombat('player') then return end
-	if IsReticleHidden() or IsUnitSwimming('player') or BestialTransformationActive() then return end
-
-	UpdateLowestGroupHealth()
-	MyHealth, MyMaxHealth = GetUnitPower('player', POWERTYPE_HEALTH)
-	MyHealthPercent = MyHealth/MyMaxHealth
-	MyMagicka, MyMaxMagicka = GetUnitPower('player', POWERTYPE_MAGICKA)
-	MyMagickaPercent = MyMagicka/MyMaxMagicka
-	MyStamina, MyMaxStamina = GetUnitPower('player', POWERTYPE_STAMINA)
-	MyStaminaPercent = MyStamina/MyMaxStamina
-	MyUltimate, MyMaxUltimate = GetUnitPower('player', POWERTYPE_ULTIMATE)
-	MyUltimatePercent = MyUltimate/MyMaxUltimate
-	UpdateBuffs()
+UpdateLowestGroupHealth()
 
 	-- Core Healing
 	if LowestGroupHealthPercent < 0.40 and MyMagicka > 3500 then
@@ -150,24 +135,37 @@ local function AutoFightMain()
 	elseif LowestGroupHealthPercent < 0.80 and MyMagickaPercent > 0.90 then
 		LibPixelControl.SetIndOnFor(LibPixelControl.VK_1,50)
 
-	-- Buffs
-
-
 	-- Light Attacks
 	elseif DoesUnitExist('reticleover') and GetUnitReaction('reticleover') == UNIT_REACTION_HOSTILE and not IsUnitDead('reticleover') and not IsBlockActive() then
 		LibPixelControl.SetIndOnFor(LibPixelControl.VM_BTN_LEFT,50)
 
 	end
 
+-- END LEGACY CODE
+
+-- START CHARACTER-SPECIFIC CODE 01
+
+local CharacterFirstName = "Generic"
+
+local function AutoFightMain()
+	if AutoFightShouldNotAct() then return end
+	
 end
 
+-- END CHARACTER-SPECIFIC CODE 01
+
+-- START COMMON CODE 02
+
+local ADDON_NAME = "AutoFight-"..CharacterFirstName
 local function OnAddonLoaded(event, name)
 	if name == ADDON_NAME then
 		EVENT_MANAGER:UnregisterForEvent(ADDON_NAME, event)
-		if string.find(GetUnitName("player"),"Generic") then
+		if string.find(GetUnitName("player"),CharacterFirstName) then
 			EVENT_MANAGER:RegisterForUpdate(ADDON_NAME, 100, AutoFightMain)
 		end
 	end
 end
-
 EVENT_MANAGER:RegisterForEvent(ADDON_NAME, EVENT_ADD_ON_LOADED, OnAddonLoaded)
+
+-- END COMMON CODE 02
+
