@@ -2,6 +2,15 @@
 
 -- start local copies
 
+local VK1 = LibPixelControl.VK_1
+local VK2 = LibPixelControl.VK_2
+local VK3 = LibPixelControl.VK_3
+local VK4 = LibPixelControl.VK_4
+local VK5 = LibPixelControl.VK_5
+local VMLeft = LibPixelControl.VM_BTN_LEFT
+
+local Blocking = IsBlockActive
+
 -- end local copies
 
 local function Health()
@@ -17,6 +26,8 @@ local function Stamina()
 	return ((MyStamina/MyMaxStamina)*100)
 end
 local function UltimateReady()
+	local MyUltimate, _ = GetUnitPower('player', POWERTYPE_ULTIMATE)
+	return (MyUltimate >= GetAbilityCost(GetSlotBoundId(8)))
 end
 local function UnitHasRegen(unitTag)
 	local numBuffs = GetNumBuffs(unitTag)
@@ -70,41 +81,16 @@ local function AutoFightShouldNotAct()
 	return (not IsUnitInCombat('player') or IsReticleHidden() or IsUnitSwimming('player') or IHave("Bestial Transformation"))
 end
 
--- END COMMON CODE 01
-
--- START LEGACY CODE
-
-
-local function UltimateCost()
-	return GetAbilityCost(GetSlotBoundId(8))
-end
-
-local LowestGroupHealthPercentWithoutRegen
-local LowestGroupHealthPercentWithRegen
-local LowestGroupHealthPercent
-local GroupSize = 0
-local function UpdateLowestGroupHealth()
+local function LowestGroupHealthPercent()
 	GroupSize = GetGroupSize()
-	LowestGroupHealthPercentWithoutRegen = 1.00
-	LowestGroupHealthPercentWithRegen = 1.00
-	LowestGroupHealthPercent = 1.00
-
+	local LowestGroupHealthPercent = 1.00
 	if GroupSize > 0 then
 		for i = 1, GroupSize do
 			local unitTag = GetGroupUnitTagByIndex(i)
 			local currentHp, maxHp, effectiveMaxHp = GetUnitPower(unitTag, POWERTYPE_HEALTH)
 			local HpPercent = currentHp / maxHp
-			local HasRegen = UnitHasRegen(unitTag)
-			local InHealingRange = IsUnitInGroupSupportRange(unitTag)
-			local IsAlive = not IsUnitDead(unitTag)
-			local IsPlayer = GetUnitType(unitTag) == 1
-			if HpPercent < LowestGroupHealthPercent and InHealingRange and IsAlive and IsPlayer then
+			if HpPercent < LowestGroupHealthPercent and IsUnitInGroupSupportRange(unitTag) and not IsUnitDead(unitTag) and GetUnitType(unitTag) == 1 then
 				LowestGroupHealthPercent = HpPercent
-			end
-			if HpPercent < LowestGroupHealthPercentWithoutRegen and HasRegen == false and InHealingRange and IsAlive and IsPlayer then
-				LowestGroupHealthPercentWithoutRegen = HpPercent
-			elseif HpPercent < LowestGroupHealthPercentWithRegen and HasRegen and InHealingRange and IsAlive and IsPlayer then
-				LowestGroupHealthPercentWithRegen = HpPercent
 			end
 		end
 	else
@@ -112,44 +98,45 @@ local function UpdateLowestGroupHealth()
 		local currentHp, maxHp, effectiveMaxHp = GetUnitPower(unitTag, POWERTYPE_HEALTH)
 		local HpPercent = currentHp / maxHp
 		LowestGroupHealthPercent = HpPercent
-		local HasRegen = UnitHasRegen(unitTag)
-		if HasRegen == false then
-			LowestGroupHealthPercentWithoutRegen = HpPercent
-		elseif HasRegen then
-			LowestGroupHealthPercentWithRegen = HpPercent
-		end
 	end
+	return (LowestGroupHealthPercent * 100)
+end
+local function LowestGroupHealthPercentWithoutRegen()
+	GroupSize = GetGroupSize()
+	local LowestGroupHealthPercent = 1.00
+	if GroupSize > 0 then
+		for i = 1, GroupSize do
+			local unitTag = GetGroupUnitTagByIndex(i)
+			local currentHp, maxHp, effectiveMaxHp = GetUnitPower(unitTag, POWERTYPE_HEALTH)
+			local HpPercent = currentHp / maxHp
+			if HpPercent < LowestGroupHealthPercent and not UnitHasRegen(unitTag) and IsUnitInGroupSupportRange(unitTag) and not IsUnitDead(unitTag) and GetUnitType(unitTag) == 1 then
+				LowestGroupHealthPercent = HpPercent
+			end
+		end
+	else
+		local unitTag = "player"
+		local currentHp, maxHp, effectiveMaxHp = GetUnitPower(unitTag, POWERTYPE_HEALTH)
+		local HpPercent = currentHp / maxHp
+		LowestGroupHealthPercent = HpPercent
+	end
+	return (LowestGroupHealthPercent * 100)
 end
 
-UpdateLowestGroupHealth()
+local function Press(key)
+	LibPixelControl.SetIndOnFor(key,50)
+end
 
-	-- Core Healing
-	if LowestGroupHealthPercent < 0.40 and MyMagicka > 3500 then
-		LibPixelControl.SetIndOnFor(LibPixelControl.VK_1,50)
-	elseif LowestGroupHealthPercentWithoutRegen < 0.90 and MyMagicka > 3500 then
-		LibPixelControl.SetIndOnFor(LibPixelControl.VK_2,50)
-
-	-- Proactive Healing
-	elseif LowestGroupHealthPercent < 0.60 and MyMagicka > 20000 then
-		LibPixelControl.SetIndOnFor(LibPixelControl.VK_1,50)
-	elseif LowestGroupHealthPercent < 0.80 and MyMagickaPercent > 0.90 then
-		LibPixelControl.SetIndOnFor(LibPixelControl.VK_1,50)
-
-	-- Light Attacks
-	elseif DoesUnitExist('reticleover') and GetUnitReaction('reticleover') == UNIT_REACTION_HOSTILE and not IsUnitDead('reticleover') and not IsBlockActive() then
-		LibPixelControl.SetIndOnFor(LibPixelControl.VM_BTN_LEFT,50)
-
-	end
-
--- END LEGACY CODE
+-- END COMMON CODE 01
 
 -- START CHARACTER-SPECIFIC CODE 01
 
 local CharacterFirstName = "Generic"
 
 local function AutoFightMain()
-	if AutoFightShouldNotAct() then return end
-	
+	if AutoFightShouldNotAct() then return
+	elseif Health() < 0.40 then Press(VK4)
+	elseif TargetIsHostileNpc() and not Blocking() then Press(VMLeft)
+	end
 end
 
 -- END CHARACTER-SPECIFIC CODE 01
