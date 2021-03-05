@@ -82,7 +82,7 @@ local function AutoFightShouldNotAct()
 end
 
 local function LowestGroupHealthPercent()
-	GroupSize = GetGroupSize()
+	local GroupSize = GetGroupSize()
 	local LowestGroupHealthPercent = 1.00
 	if GroupSize > 0 then
 		for i = 1, GroupSize do
@@ -102,7 +102,7 @@ local function LowestGroupHealthPercent()
 	return (LowestGroupHealthPercent * 100)
 end
 local function LowestGroupHealthPercentWithoutRegen()
-	GroupSize = GetGroupSize()
+	local GroupSize = GetGroupSize()
 	local LowestGroupHealthPercent = 1.00
 	if GroupSize > 0 then
 		for i = 1, GroupSize do
