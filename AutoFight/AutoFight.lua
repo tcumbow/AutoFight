@@ -125,7 +125,25 @@ end
 local function Press(key)
 	LibPixelControl.SetIndOnFor(key,50)
 end
-
+local function Hold(key)
+	if not LibPixelControl.IsIndOn(key) then LibPixelControl.SetIndOn(key) end
+end
+local function Release(key)
+	if LibPixelControl.IsIndOn(key) then LibPixelControl.SetIndOff(key) end
+end
+local function HeavyAttack()
+	Hold(VMLeft)
+end
+local function EndHeavyAttack()
+	Release(VMLeft)
+end
+local function UseAbility(num)
+	EndHeavyAttack()
+	Press(VK1+num-1)
+end
+local function WeaveAbility(num)
+	Press(VK1+num-1)
+end
 -- END COMMON CODE 01
 
 -- START CHARACTER-SPECIFIC CODE 01
@@ -133,9 +151,8 @@ end
 local CharacterFirstName = "Generic"
 
 local function AutoFightMain()
-	if AutoFightShouldNotAct() then return
-	elseif Health() < 40 then Press(VK4)
-	elseif TargetIsHostileNpc() and not Blocking() then Press(VMLeft)
+	if AutoFightShouldNotAct() then EndHeavyAttack()
+	else EndHeavyAttack()
 	end
 end
 
