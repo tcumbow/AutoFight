@@ -134,7 +134,7 @@ local CharacterFirstName = "Generic"
 
 local function AutoFightMain()
 	if AutoFightShouldNotAct() then return
-	elseif Health() < 0.40 then Press(VK4)
+	elseif Health() < 40 then Press(VK4)
 	elseif TargetIsHostileNpc() and not Blocking() then Press(VMLeft)
 	end
 end
