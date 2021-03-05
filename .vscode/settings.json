@@ -91,7 +91,7 @@
     "emeraldwalk.runonsave": {
         "commands": [
             {
-                "cmd": "copyrobo .\\AutoFight A:\\AutoFight-Generic /mir"
+                "cmd": "robocopy .\\AutoFight A:\\AutoFight-Gideon /mir"
             }
         ]
     }
