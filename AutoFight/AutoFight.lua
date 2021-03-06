@@ -167,7 +167,7 @@ local function AutoFightMain()
 	elseif not IHave("Minor Sorcery") and TargetIsHostileNpc() and Magicka()>80 then WeaveAbility(5)
 	elseif UltimateReady() then UseUltimate()
 	elseif not TargetHas("Minor Magickasteal") and TargetIsHostileNpc() then WeaveAbility(3)
-	elseif LowestGroupHealthPercentWithoutRegen()<90 and Magicka()>99 then WeaveAbility(2)
+	elseif Magicka()>99 then WeaveAbility(2)
 	elseif TargetIsHostileNpc() and not Blocking() then HeavyAttack()
 	else EndHeavyAttack()
 	end
