@@ -157,11 +157,11 @@ local CharacterFirstName = "Gideon"
 
 local function AutoFightMain()
 	if AutoFightShouldNotAct() then EndHeavyAttack()
-	elseif LowestGroupHealthPercentWithoutRegen() < 90 then WeaveAbility(2)
 	elseif LowestGroupHealthPercent() < 40 then UseAbility(1)
+	elseif LowestGroupHealthPercentWithoutRegen() < 90 then UseAbility(2)
 	elseif not TargetHas("Minor Magickasteal") and TargetIsHostileNpc() then WeaveAbility(3)
 	elseif not TargetHas("Degeneration") and TargetIsHostileNpc() and Magicka() > 80 then WeaveAbility(5)
-	elseif UltimateReady() and TargetIsHostileNpc then UseUltimate()
+	elseif UltimateReady() and TargetIsHostileNpc() then UseUltimate()
 	elseif TargetIsHostileNpc() and not Blocking() then HeavyAttack()
 	else EndHeavyAttack()
 	end
