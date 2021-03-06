@@ -7,6 +7,7 @@ local VK2 = LibPixelControl.VK_2
 local VK3 = LibPixelControl.VK_3
 local VK4 = LibPixelControl.VK_4
 local VK5 = LibPixelControl.VK_5
+local VKR = LibPixelControl.VK_R
 local VMLeft = LibPixelControl.VM_BTN_LEFT
 
 local Blocking = IsBlockActive
@@ -141,6 +142,10 @@ local function UseAbility(num)
 	EndHeavyAttack()
 	Press(VK1+num-1)
 end
+local function UseUltimate()
+	EndHeavyAttack()
+	Press(VKR)
+end
 local function WeaveAbility(num)
 	Press(VK1+num-1)
 end
@@ -156,6 +161,7 @@ local function AutoFightMain()
 	elseif LowestGroupHealthPercent() < 40 then UseAbility(1)
 	elseif not TargetHas("Minor Magickasteal") and TargetIsHostileNpc() then WeaveAbility(3)
 	elseif not TargetHas("Degeneration") and TargetIsHostileNpc() and Magicka() > 80 then WeaveAbility(5)
+	elseif UltimateReady() and TargetIsHostileNpc then UseUltimate()
 	elseif TargetIsHostileNpc() and not Blocking() then HeavyAttack()
 	else EndHeavyAttack()
 	end
