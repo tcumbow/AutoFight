@@ -151,13 +151,13 @@ local function AutoFightMain()
 	UpdateBuffs()
 
 	-- Core Healing
-	if not TwilightActive and MyMagicka > 7000 then
-		LibPixelControl.SetIndOnFor(LibPixelControl.VK_2,50)
-	elseif LowestGroupHealthPercent < 0.40 and MyMagicka > 3500 then
-		LibPixelControl.SetIndOnFor(LibPixelControl.VK_2,50)
+	-- if not TwilightActive and MyMagicka > 7000 then
+	-- 	LibPixelControl.SetIndOnFor(LibPixelControl.VK_2,50)
+	-- elseif LowestGroupHealthPercent < 0.40 and MyMagicka > 3500 then
+	-- 	LibPixelControl.SetIndOnFor(LibPixelControl.VK_2,50)
 
 	-- Taunting
-	elseif TargetShouldBeTaunted() and MyMagicka > 3500 then
+	if TargetShouldBeTaunted() and MyMagicka > 3500 then
 		LibPixelControl.SetIndOnFor(LibPixelControl.VK_3,50)
 
 	-- -- Familiar
@@ -167,8 +167,8 @@ local function AutoFightMain()
 	-- 	LibPixelControl.SetIndOnFor(LibPixelControl.VK_5,50)
 
 	-- Light Attacks
-	elseif DoesUnitExist('reticleover') and GetUnitReaction('reticleover') == UNIT_REACTION_HOSTILE and not IsUnitDead('reticleover') and not IsBlockActive() then
-		LibPixelControl.SetIndOnFor(LibPixelControl.VM_BTN_LEFT,50)
+	-- elseif DoesUnitExist('reticleover') and GetUnitReaction('reticleover') == UNIT_REACTION_HOSTILE and not IsUnitDead('reticleover') and not IsBlockActive() then
+	-- 	LibPixelControl.SetIndOnFor(LibPixelControl.VM_BTN_LEFT,50)
 
 	end
 
