@@ -61,7 +61,7 @@ local function IHave(buffName)
 	local numAuras = GetNumBuffs('player')
 	if (numAuras > 0) then
 		for i = 1, numAuras do
-			local name, _, _, _, _, _, _, _, _, _, _, _ = GetUnitBuffInfo('reticleover', i)
+			local name, _, _, _, _, _, _, _, _, _, _, _ = GetUnitBuffInfo('player', i)
 			if name==buffName then
 				return true
 			end
