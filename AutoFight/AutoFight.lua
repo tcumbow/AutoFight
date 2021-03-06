@@ -160,6 +160,7 @@ local CharacterFirstName = "Gideon"
 
 local function AutoFightMain()
 	if AutoFightShouldNotAct() then EndHeavyAttack()
+	elseif Magicka()<15 and not Blocking() then HeavyAttack()
 	elseif LowestGroupHealthPercent()<40 then UseAbility(1)
 	elseif LowestGroupHealthPercent()<60 and Magicka()>70 then UseAbility(1)
 	elseif LowestGroupHealthPercentWithoutRegen()<80 then UseAbility(2)
