@@ -158,7 +158,7 @@ local function AutoFightMain()
 
 	-- Taunting
 	if TargetShouldBeTaunted() and MyMagicka > 3500 then
-		LibPixelControl.SetIndOnFor(LibPixelControl.VK_3,50)
+		LibPixelControl.SetIndOnFor(LibPixelControl.VK_4,50)
 
 	-- -- Familiar
 	elseif not FamiliarActive and MyMagickaPercent > 0.50 then
