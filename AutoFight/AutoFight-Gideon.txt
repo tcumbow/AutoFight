@@ -7,7 +7,7 @@
 ## Title: AutoFight-Gideon
 ## Version: 1.0
 ## AddOnVersion: 1060
-## APIVersion: 100033 100034
+## APIVersion: 100034 100035
 ## Author: Tom Cumbow
 ## Description: AutoFight-Gideon
 ## DependsOn: LibPixelControl
