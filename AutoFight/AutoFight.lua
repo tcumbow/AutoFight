@@ -157,10 +157,24 @@ end
 -- START CHARACTER-SPECIFIC CODE 01
 
 local CharacterFirstName = "Galilei"
+local LastMarkTarget = 0
+
+local function TimeSinceLastMarkTarget()
+	return ((GetGameTimeMilliseconds() - LastMarkTarget)/1000)
+end
+
+local function UsedMarkTarget()
+	LastMarkTarget = GetGameTimeMilliseconds()
+end
 
 local function AutoFightMain()
 	if AutoFightShouldNotAct() then EndHeavyAttack()
-	elseif UltimateReady() and TargetIsHostileNpc then UseUltimate()
+	elseif Health() < 60 then WeaveAbility(4)
+	elseif TargetIsHostileNpc() and not TargetHas("Major Breach") and TimeSinceLastMarkTarget() > 5 then
+		WeaveAbility(3)
+		UsedMarkTarget()
+	elseif UltimateReady() and TargetIsHostileNpc() then UseUltimate()
+	elseif TargetIsHostileNpc() and Stamina() > 40 then WeaveAbility(1)
 	else EndHeavyAttack()
 	end
 end
