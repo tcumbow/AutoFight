@@ -34,7 +34,7 @@ local function UnitHasRegen(unitTag)
 end
 
 local function TargetShouldBeTaunted()
-	if (not DoesUnitExist('reticleover') or IsUnitDead('reticleover') or GetUnitType('reticleover') == 1 or GetUnitReaction('reticleover') ~= UNIT_REACTION_HOSTILE or GetUnitDifficulty("reticleover") < 3) then
+	if (not DoesUnitExist('reticleover') or IsUnitDead('reticleover') or GetUnitType('reticleover') == 1 or GetUnitReaction('reticleover') ~= UNIT_REACTION_HOSTILE or (GetUnitDifficulty("reticleover") < 3) and MyStaminaPercent < 0.50) then
 		return false
 	end
 
@@ -157,7 +157,7 @@ local function AutoFightMain()
 	-- 	LibPixelControl.SetIndOnFor(LibPixelControl.VK_2,50)
 
 	-- Taunting
-	if TargetShouldBeTaunted() and MyMagicka > 3500 then
+	if TargetShouldBeTaunted() then
 		LibPixelControl.SetIndOnFor(LibPixelControl.VK_4,50)
 
 	-- -- Familiar
