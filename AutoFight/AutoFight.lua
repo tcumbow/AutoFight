@@ -156,7 +156,7 @@ end
 
 -- START CHARACTER-SPECIFIC CODE 01
 
-local CharacterFirstName = "Generic"
+local CharacterFirstName = "Galilei"
 
 local function AutoFightMain()
 	if AutoFightShouldNotAct() then EndHeavyAttack()
