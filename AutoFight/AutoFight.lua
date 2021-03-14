@@ -136,11 +136,16 @@ end
 local function Press(key)
 	LibPixelControl.SetIndOnFor(key,50)
 end
+local WeAreHolding = { }
 local function Hold(key)
-	if not LibPixelControl.IsIndOn(key) then LibPixelControl.SetIndOn(key) end
+	if not LibPixelControl.IsIndOn(key) then
+		LibPixelControl.SetIndOn(key)
+		WeAreHolding[key] = true
+	end
 end
 local function Release(key)
-	if LibPixelControl.IsIndOn(key) then LibPixelControl.SetIndOff(key) end
+	if WeAreHolding[key] and LibPixelControl.IsIndOn(key) then LibPixelControl.SetIndOff(key) end
+	WeAreHolding[key] = false
 end
 local function HeavyAttack()
 	Hold(VMLeft)
@@ -159,6 +164,9 @@ end
 local function WeaveAbility(num)
 	Press(VK1+num-1)
 end
+local function DoNothing()
+	EndHeavyAttack()
+end
 -- END COMMON CODE 01
 
 -- START CHARACTER-SPECIFIC CODE 01
@@ -166,7 +174,7 @@ end
 local CharacterFirstName = "Gideon"
 
 local function AutoFightMain()
-	if AutoFightShouldNotAct() then EndHeavyAttack()
+	if AutoFightShouldNotAct() then DoNothing()
 	elseif Magicka()<15 and not Blocking() then HeavyAttack()
 	elseif LowestGroupHealthPercent()<40 then UseAbility(1)
 	elseif LowestGroupHealthPercent()<60 and Magicka()>70 then UseAbility(1)
@@ -177,7 +185,7 @@ local function AutoFightMain()
 	-- elseif not TargetHas("Minor Magickasteal") and TargetIsHostileNpc() then WeaveAbility(3)
 	elseif Magicka()>99 and TargetIsHostileNpc() and not Blocking() then WeaveAbility(5)
 	elseif TargetIsHostileNpc() and not Blocking() then HeavyAttack()
-	else EndHeavyAttack()
+	else DoNothing()
 	end
 end
 
