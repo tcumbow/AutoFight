@@ -81,6 +81,14 @@ end
 local function TargetName()
 	return (GetUnitName('reticleover'))
 end
+local function InteractVerb()
+	local action, _, _, _, _ = GetGameCameraInteractableActionInfo()
+	return action
+end
+local function InteractName()
+	local _, interactableName, _, _, _ = GetGameCameraInteractableActionInfo()
+	return interactableName
+end
 local function AutoFightShouldNotAct()
 	return (not IsUnitInCombat('player') or IsReticleHidden() or IsUnitSwimming('player') or IHave("Bestial Transformation") or TargetName()=="Plane Meld Rift" or TargetName()=="Lightning Aspect")
 end
