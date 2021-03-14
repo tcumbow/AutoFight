@@ -92,7 +92,6 @@ end
 local function AutoFightShouldNotAct()
 	return (not IsUnitInCombat('player') or IsReticleHidden() or IsUnitSwimming('player') or IHave("Bestial Transformation") or TargetName()=="Plane Meld Rift" or TargetName()=="Lightning Aspect")
 end
-
 local function LowestGroupHealthPercent()
 	local GroupSize = GetGroupSize()
 	local LowestGroupHealthPercent = 1.00
