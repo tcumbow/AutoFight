@@ -124,7 +124,7 @@ local function LowestGroupHealthPercentWithoutRegen()
 				LowestGroupHealthPercent = HpPercent
 			end
 		end
-	else
+	elseif not UnitHasRegen("player") then
 		local unitTag = "player"
 		local currentHp, maxHp, effectiveMaxHp = GetUnitPower(unitTag, POWERTYPE_HEALTH)
 		local HpPercent = currentHp / maxHp
