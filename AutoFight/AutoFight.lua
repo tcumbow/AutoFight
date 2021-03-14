@@ -175,7 +175,7 @@ local CharacterFirstName = "Generic"
 
 local function AutoFightMain()
 	if AutoFightShouldNotAct() then DoNothing()
-	elseif UltimateReady() and TargetIsHostileNpc then UseUltimate()
+	elseif UltimateReady() and TargetIsHostileNpc() then UseUltimate()
 	else DoNothing()
 	end
 end
