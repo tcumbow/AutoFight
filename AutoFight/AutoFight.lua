@@ -81,10 +81,17 @@ end
 local function TargetName()
 	return (GetUnitName('reticleover'))
 end
-local function AutoFightShouldNotAct()
-	return (not IsUnitInCombat('player') or IsReticleHidden() or IsUnitSwimming('player') or IHave("Bestial Transformation") or TargetName()=="Plane Meld Rift" or TargetName()=="Lightning Aspect")
+local function InteractVerb()
+	local action, _, _, _, _ = GetGameCameraInteractableActionInfo()
+	return action
 end
-
+local function InteractName()
+	local _, interactableName, _, _, _ = GetGameCameraInteractableActionInfo()
+	return interactableName
+end
+local function AutoFightShouldNotAct()
+	return (not IsUnitInCombat('player') or IsReticleHidden() or IsUnitSwimming('player') or IHave("Bestial Transformation") or TargetName()=="Plane Meld Rift" or TargetName()=="Lightning Aspect" or InteractName()=="Cage of Torment" or InteractName()=="Daedric Alter")
+end
 local function LowestGroupHealthPercent()
 	local GroupSize = GetGroupSize()
 	local LowestGroupHealthPercent = 1.00
