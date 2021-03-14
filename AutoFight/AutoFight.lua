@@ -136,11 +136,16 @@ end
 local function Press(key)
 	LibPixelControl.SetIndOnFor(key,50)
 end
+local WeAreHolding = { }
 local function Hold(key)
-	if not LibPixelControl.IsIndOn(key) then LibPixelControl.SetIndOn(key) end
+	if not LibPixelControl.IsIndOn(key) then
+		LibPixelControl.SetIndOn(key)
+		WeAreHolding[key] = true
+	end
 end
 local function Release(key)
-	if LibPixelControl.IsIndOn(key) then LibPixelControl.SetIndOff(key) end
+	if WeAreHolding[key] and LibPixelControl.IsIndOn(key) then LibPixelControl.SetIndOff(key) end
+	WeAreHolding[key] = false
 end
 local function HeavyAttack()
 	Hold(VMLeft)
@@ -158,6 +163,9 @@ local function UseUltimate()
 end
 local function WeaveAbility(num)
 	Press(VK1+num-1)
+end
+local function DoNothing()
+	EndHeavyAttack()
 end
 -- END COMMON CODE 01
 
