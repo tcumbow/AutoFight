@@ -81,10 +81,17 @@ end
 local function TargetName()
 	return (GetUnitName('reticleover'))
 end
-local function AutoFightShouldNotAct()
-	return (not IsUnitInCombat('player') or IsReticleHidden() or IsUnitSwimming('player') or IHave("Bestial Transformation") or TargetName()=="Plane Meld Rift" or TargetName()=="Lightning Aspect")
+local function InteractVerb()
+	local action, _, _, _, _ = GetGameCameraInteractableActionInfo()
+	return action
 end
-
+local function InteractName()
+	local _, interactableName, _, _, _ = GetGameCameraInteractableActionInfo()
+	return interactableName
+end
+local function AutoFightShouldNotAct()
+	return (not IsUnitInCombat('player') or IsReticleHidden() or IsUnitSwimming('player') or IHave("Bestial Transformation") or TargetName()=="Plane Meld Rift" or TargetName()=="Lightning Aspect" or InteractName()=="Cage of Torment" or InteractName()=="Daedric Alter")
+end
 local function LowestGroupHealthPercent()
 	local GroupSize = GetGroupSize()
 	local LowestGroupHealthPercent = 1.00
@@ -117,7 +124,7 @@ local function LowestGroupHealthPercentWithoutRegen()
 				LowestGroupHealthPercent = HpPercent
 			end
 		end
-	else
+	elseif not UnitHasRegen("player") then
 		local unitTag = "player"
 		local currentHp, maxHp, effectiveMaxHp = GetUnitPower(unitTag, POWERTYPE_HEALTH)
 		local HpPercent = currentHp / maxHp
@@ -129,11 +136,16 @@ end
 local function Press(key)
 	LibPixelControl.SetIndOnFor(key,50)
 end
+local WeAreHolding = { }
 local function Hold(key)
-	if not LibPixelControl.IsIndOn(key) then LibPixelControl.SetIndOn(key) end
+	if not LibPixelControl.IsIndOn(key) then
+		LibPixelControl.SetIndOn(key)
+		WeAreHolding[key] = true
+	end
 end
 local function Release(key)
-	if LibPixelControl.IsIndOn(key) then LibPixelControl.SetIndOff(key) end
+	if WeAreHolding[key] and LibPixelControl.IsIndOn(key) then LibPixelControl.SetIndOff(key) end
+	WeAreHolding[key] = false
 end
 local function HeavyAttack()
 	Hold(VMLeft)
@@ -152,6 +164,9 @@ end
 local function WeaveAbility(num)
 	Press(VK1+num-1)
 end
+local function DoNothing()
+	EndHeavyAttack()
+end
 -- END COMMON CODE 01
 
 -- START CHARACTER-SPECIFIC CODE 01
@@ -168,14 +183,14 @@ local function UsedMarkTarget()
 end
 
 local function AutoFightMain()
-	if AutoFightShouldNotAct() then EndHeavyAttack()
+	if AutoFightShouldNotAct() then DoNothing()
 	elseif Health() < 60 then WeaveAbility(4)
 	elseif TargetIsHostileNpc() and not TargetHas("Major Breach") and TimeSinceLastMarkTarget() > 5 then
 		WeaveAbility(3)
 		UsedMarkTarget()
 	elseif UltimateReady() and TargetIsHostileNpc() then UseUltimate()
 	elseif TargetIsHostileNpc() and Stamina() > 40 then WeaveAbility(1)
-	else EndHeavyAttack()
+	else DoNothing()
 	end
 end
 
