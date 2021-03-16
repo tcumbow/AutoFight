@@ -190,6 +190,7 @@ local function AutoFightMain()
 		UsedMarkTarget()
 	elseif UltimateReady() and TargetIsHostileNpc() then UseUltimate()
 	elseif TargetIsHostileNpc() and Stamina() > 40 then WeaveAbility(1)
+	elseif TargetIsHostileNpc() then HeavyAttack()
 	else DoNothing()
 	end
 end
