@@ -90,7 +90,7 @@ local function InteractName()
 	return interactableName
 end
 local function AutoFightShouldNotAct()
-	return (not IsUnitInCombat('player') or IsReticleHidden() or IsUnitSwimming('player') or IHave("Bestial Transformation") or TargetName()=="Plane Meld Rift" or TargetName()=="Lightning Aspect" or InteractName()=="Cage of Torment" or InteractName()=="Daedric Alter")
+	return (not IsUnitInCombat('player') or IsReticleHidden() or IsUnitSwimming('player') or IHave("Bestial Transformation") or IHave("Skeevaton") or TargetName()=="Plane Meld Rift" or TargetName()=="Lightning Aspect" or InteractName()=="Cage of Torment" or InteractName()=="Daedric Alter")
 end
 local function LowestGroupHealthPercent()
 	local GroupSize = GetGroupSize()
@@ -152,6 +152,10 @@ local function HeavyAttack()
 end
 local function EndHeavyAttack()
 	Release(VMLeft)
+end
+local function LightAttack()
+	EndHeavyAttack()
+	Press(VMLeft)
 end
 local function UseAbility(num)
 	EndHeavyAttack()
