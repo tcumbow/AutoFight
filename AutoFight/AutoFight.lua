@@ -171,11 +171,21 @@ end
 
 -- START CHARACTER-SPECIFIC CODE 01
 
-local CharacterFirstName = "Generic"
+local CharacterFirstName = "Cora"
 
 local function AutoFightMain()
 	if AutoFightShouldNotAct() then DoNothing()
+	elseif Magicka()<15 and not Blocking() then HeavyAttack()
+	-- elseif LowestGroupHealthPercent()<40 then UseAbility(1)
+	-- elseif LowestGroupHealthPercent()<60 and Magicka()>70 then UseAbility(1)
+	elseif LowestGroupHealthPercentWithoutRegen()<80 then UseAbility(2)
+	elseif LowestGroupHealthPercentWithoutRegen()<90 then WeaveAbility(2)
+	elseif not IHave("Major Resolve") then WeaveAbility(5)
 	elseif UltimateReady() and TargetIsHostileNpc() then UseUltimate()
+	elseif not IHave("Major Sorcery") then WeaveAbility(4)
+	elseif not IHave("Major Prophecy") then WeaveAbility(3)
+	elseif Magicka()>99 and TargetIsHostileNpc() and not Blocking() then WeaveAbility(1)
+	elseif TargetIsHostileNpc() and not Blocking() then HeavyAttack()
 	else DoNothing()
 	end
 end
