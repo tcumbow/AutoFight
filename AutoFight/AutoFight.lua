@@ -153,6 +153,10 @@ end
 local function EndHeavyAttack()
 	Release(VMLeft)
 end
+local function LightAttack()
+	EndHeavyAttack()
+	Press(VMLeft)
+end
 local function UseAbility(num)
 	EndHeavyAttack()
 	Press(VK1+num-1)
