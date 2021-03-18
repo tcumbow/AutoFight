@@ -69,6 +69,18 @@ local function IHave(buffName)
 	end
 	return false
 end
+local function IHaveId(buffId)
+	local numAuras = GetNumBuffs('player')
+	if (numAuras > 0) then
+		for i = 1, numAuras do
+			local _, _, _, _, _, _, _, _, _, _, id, _ = GetUnitBuffInfo('player', i)
+			if id==buffId then
+				return true
+			end
+		end
+	end
+	return false
+end
 local function TargetIsBoss()
 	return (GetUnitDifficulty("reticleover") < 3)
 end
