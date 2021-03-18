@@ -92,7 +92,7 @@
     "emeraldwalk.runonsave": {
         "commands": [
             {
-                "cmd": "robocopy .\\AutoFight S:\\AutoFight-Hadara /mir"
+                "cmd": "copyrobo .\\AutoFight S:\\AutoFight-Hadara /mir"
             }
         ]
     }
