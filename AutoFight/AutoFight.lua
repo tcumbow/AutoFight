@@ -81,6 +81,9 @@ local function IHaveId(buffId)
 	end
 	return false
 end
+local function VolatilePulseReady()
+	return (IHave("Summon Volatile Familiar") and not IHaveId("88933"))
+end
 local function TargetIsBoss()
 	return (GetUnitDifficulty("reticleover") < 3)
 end
