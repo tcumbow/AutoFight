@@ -127,10 +127,13 @@ local CrystalFragmentsProc
 local EnergyOverloadActive
 local function UpdateBuffs()
 	MajorSorcery = false
+	FamiliarAOEActive = false
 	local numBuffs = GetNumBuffs("player")
 	if numBuffs > 0 then
 		for i = 1, numBuffs do
 			local name, _, endTime, _, _, _, _, _, _, _, id, _ = GetUnitBuffInfo("player", i)
+			d(name)
+			d(id)
 			if name=="Major Sorcery" then
 				MajorSorcery = true
 			elseif name=="Major Resolve" then
