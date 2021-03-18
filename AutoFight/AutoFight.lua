@@ -168,6 +168,9 @@ end
 local function EndHeavyAttack()
 	Release(VMLeft)
 end
+local function HeavyAttackInProgress()
+	return (WeAreHolding[VMLeft])
+end
 local function LightAttack()
 	EndHeavyAttack()
 	Press(VMLeft)
