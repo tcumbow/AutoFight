@@ -179,7 +179,7 @@ local CharacterFirstName = "Galilei"
 local function AutoFightMain()
 	if AutoFightShouldNotAct() then DoNothing()
 	elseif Health() < 60 then WeaveAbility(4)
-	elseif UltimateReady() and TargetIsHostileNpc() then UseUltimate()
+	elseif UltimateReady() and TargetIsHostileNpc() and TargetIsMoreThanTrash() then UseUltimate()
 	elseif TargetIsHostileNpc() and not TargetHas("Minor Vulnerability") and Magicka() > 25 then WeaveAbility(3)
 	elseif TargetIsHostileNpc() and Stamina() > 40 then WeaveAbility(1)
 	elseif TargetIsHostileNpc() then HeavyAttack()
