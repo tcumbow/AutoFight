@@ -70,7 +70,10 @@ local function IHave(buffName)
 	return false
 end
 local function TargetIsBoss()
-	return (GetUnitDifficulty("reticleover") < 3)
+	return (GetUnitDifficulty("reticleover") >= 3)
+end
+local function TargetIsMoreThanTrash()
+	return (GetUnitDifficulty("reticleover") >= 2)
 end
 local function TargetCouldBeTaunted()
 	return (TargetIsHostileNpc() and TargetHas("Taunt"))
