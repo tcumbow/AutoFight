@@ -9,6 +9,7 @@ local VK4 = LibPixelControl.VK_4
 local VK5 = LibPixelControl.VK_5
 local VKR = LibPixelControl.VK_R
 local VMLeft = LibPixelControl.VM_BTN_LEFT
+local VMRight = LibPixelControl.VM_BTN_RIGHT
 
 local Blocking = IsBlockActive
 
@@ -173,7 +174,11 @@ local function Release(key)
 	if WeAreHolding[key] and LibPixelControl.IsIndOn(key) then LibPixelControl.SetIndOff(key) end
 	WeAreHolding[key] = false
 end
+local function EndBlock()
+	Release(VMRight)
+end
 local function HeavyAttack()
+	EndBlock()
 	Hold(VMLeft)
 end
 local function EndHeavyAttack()
@@ -197,8 +202,16 @@ end
 local function WeaveAbility(num)
 	Press(VK1+num-1)
 end
+local function Block()
+	EndHeavyAttack()
+	Hold(VMRight)
+end
+local function BlockInProgress()
+	return (WeAreHolding[VMRight])
+end
 local function DoNothing()
 	EndHeavyAttack()
+	EndBlock()
 end
 -- END COMMON CODE 01
 
