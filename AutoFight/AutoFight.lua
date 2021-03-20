@@ -103,7 +103,7 @@ local function TargetCouldBeTaunted()
 	return (TargetIsHostileNpc() and not TargetHas("Taunt"))
 end
 local function TargetShouldBeTaunted()
-	return (TargetCouldBeTaunted() and TargetIsBoss())
+	return (TargetCouldBeTaunted() and (TargetIsBoss() or (Stamina()>50 and TargetIsMoreThanTrash())))
 end
 local function TargetName()
 	return (GetUnitName('reticleover'))
