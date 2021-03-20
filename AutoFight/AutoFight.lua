@@ -100,7 +100,7 @@ local function TargetIsMoreThanTrash()
 	return (GetUnitDifficulty("reticleover") >= 2)
 end
 local function TargetCouldBeTaunted()
-	return (TargetIsHostileNpc() and TargetHas("Taunt"))
+	return (TargetIsHostileNpc() and not TargetHas("Taunt"))
 end
 local function TargetShouldBeTaunted()
 	return (TargetCouldBeTaunted() and TargetIsBoss())
