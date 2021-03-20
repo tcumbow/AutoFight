@@ -9,6 +9,7 @@ local VK4 = LibPixelControl.VK_4
 local VK5 = LibPixelControl.VK_5
 local VKR = LibPixelControl.VK_R
 local VMLeft = LibPixelControl.VM_BTN_LEFT
+local VMRight = LibPixelControl.VM_BTN_RIGHT
 
 local Blocking = IsBlockActive
 
@@ -22,9 +23,17 @@ local function Magicka()
 	local MyMagicka, MyMaxMagicka = GetUnitPower('player', POWERTYPE_MAGICKA)
 	return ((MyMagicka/MyMaxMagicka)*100)
 end
+local function MagickaPoints()
+	local MyMagicka, MyMaxMagicka = GetUnitPower('player', POWERTYPE_MAGICKA)
+	return MyMagicka
+end
 local function Stamina()
 	local MyStamina, MyMaxStamina = GetUnitPower('player', POWERTYPE_STAMINA)
 	return ((MyStamina/MyMaxStamina)*100)
+end
+local function StaminaPoints()
+	local MyStamina, MyMaxStamina = GetUnitPower('player', POWERTYPE_STAMINA)
+	return MyStamina
 end
 local function UltimateReady()
 	local MyUltimate, _ = GetUnitPower('player', POWERTYPE_ULTIMATE)
@@ -69,14 +78,32 @@ local function IHave(buffName)
 	end
 	return false
 end
+local function IHaveId(buffId)
+	local numAuras = GetNumBuffs('player')
+	if (numAuras > 0) then
+		for i = 1, numAuras do
+			local _, _, _, _, _, _, _, _, _, _, id, _ = GetUnitBuffInfo('player', i)
+			if id==buffId then
+				return true
+			end
+		end
+	end
+	return false
+end
+local function VolatilePulseReady()
+	return (IHave("Summon Volatile Familiar") and not IHaveId(88933))
+end
 local function TargetIsBoss()
-	return (GetUnitDifficulty("reticleover") < 3)
+	return (GetUnitDifficulty("reticleover") >= 3)
+end
+local function TargetIsMoreThanTrash()
+	return (GetUnitDifficulty("reticleover") >= 2)
 end
 local function TargetCouldBeTaunted()
-	return (TargetIsHostileNpc() and TargetHas("Taunt"))
+	return (TargetIsHostileNpc() and not TargetHas("Taunt"))
 end
 local function TargetShouldBeTaunted()
-	return (TargetCouldBeTaunted() and TargetIsBoss())
+	return (TargetCouldBeTaunted() and (TargetIsBoss() or (Stamina()>50 and TargetIsMoreThanTrash())))
 end
 local function TargetName()
 	return (GetUnitName('reticleover'))
@@ -147,11 +174,18 @@ local function Release(key)
 	if WeAreHolding[key] and LibPixelControl.IsIndOn(key) then LibPixelControl.SetIndOff(key) end
 	WeAreHolding[key] = false
 end
+local function EndBlock()
+	Release(VMRight)
+end
 local function HeavyAttack()
+	EndBlock()
 	Hold(VMLeft)
 end
 local function EndHeavyAttack()
 	Release(VMLeft)
+end
+local function HeavyAttackInProgress()
+	return (WeAreHolding[VMLeft])
 end
 local function LightAttack()
 	EndHeavyAttack()
@@ -168,8 +202,16 @@ end
 local function WeaveAbility(num)
 	Press(VK1+num-1)
 end
+local function Block()
+	EndHeavyAttack()
+	Hold(VMRight)
+end
+local function BlockInProgress()
+	return (WeAreHolding[VMRight])
+end
 local function DoNothing()
 	EndHeavyAttack()
+	EndBlock()
 end
 -- END COMMON CODE 01
 
