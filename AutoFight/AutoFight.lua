@@ -24,7 +24,7 @@ local function Magicka()
 end
 local function MagickaPoints()
 	local MyMagicka, MyMaxMagicka = GetUnitPower('player', POWERTYPE_MAGICKA)
-	return MyMagicka/MyMaxMagicka
+	return MyMagicka
 end
 local function Stamina()
 	local MyStamina, MyMaxStamina = GetUnitPower('player', POWERTYPE_STAMINA)
@@ -32,7 +32,7 @@ local function Stamina()
 end
 local function StaminaPoints()
 	local MyStamina, MyMaxStamina = GetUnitPower('player', POWERTYPE_STAMINA)
-	return MyStamina/MyMaxStamina
+	return MyStamina
 end
 local function UltimateReady()
 	local MyUltimate, _ = GetUnitPower('player', POWERTYPE_ULTIMATE)
