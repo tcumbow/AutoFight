@@ -52,6 +52,19 @@ local function UnitHasRegen(unitTag)
 	end
 	return false
 end
+local function UnitHasBuffTimeLeft(unitTag,buff,milliSeconds)
+	local numBuffs = GetNumBuffs(unitTag)
+	if numBuffs > 0 then
+		for i = 1, numBuffs do
+			local name, _, endTime, _, _, _, _, _, _, _, _, _ = GetUnitBuffInfo(unitTag, i)
+			if name==buff then
+				local timeLeft = (endTime*1000) - Now()
+				return (timeLeft>milliSeconds)
+			end
+		end
+	end
+	return false
+end
 local function TargetIsHostileNpc()
 	return DoesUnitExist('reticleover') and not IsUnitDead('reticleover') and GetUnitType('reticleover') ~= 1 and GetUnitReaction('reticleover') == UNIT_REACTION_HOSTILE
 end
