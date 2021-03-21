@@ -12,6 +12,7 @@ local VMLeft = LibPixelControl.VM_BTN_LEFT
 local VMRight = LibPixelControl.VM_BTN_RIGHT
 
 local Blocking = IsBlockActive
+local Now = GetGameTimeMilliseconds
 
 -- end local copies
 
