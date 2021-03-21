@@ -235,9 +235,11 @@ local CharacterFirstName = "Gideon"
 
 local function SomeoneCouldUseRegen()
 	local GroupSize = GetGroupSize()
+	local unitTag
 	if GroupSize > 0 then
 		for i = 1, GroupSize do
-			if not UnitHasBuffTimeLeft(GetGroupUnitTagByIndex(i),"Radiating Regeneration",5000) then return true end
+			unitTag = GetGroupUnitTagByIndex(i)
+			if not UnitHasBuffTimeLeft(unitTag,"Radiating Regeneration",5000) and IsUnitInGroupSupportRange(unitTag) and not IsUnitDead(unitTag) and GetUnitType(unitTag) == 1 then return true end
 		end
 		return false
 	else return (not UnitHasBuffTimeLeft("player","Radiating Regeneration",5000)) end
