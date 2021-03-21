@@ -233,6 +233,16 @@ end
 
 local CharacterFirstName = "Gideon"
 
+local function SomeoneCouldUseRegen()
+	local GroupSize = GetGroupSize()
+	if GroupSize > 0 then
+		for i = 1, GroupSize do
+			if not UnitHasBuffTimeLeft(GetGroupUnitTagByIndex(i),"Radiating Regeneration",5000) then return true end
+		end
+		return false
+	else return (not UnitHasBuffTimeLeft("player","Radiating Regeneration",5000)) end
+end
+
 local function AutoFightMain()
 	if AutoFightShouldNotAct() then DoNothing()
 	elseif Magicka()<15 and not Blocking() then HeavyAttack()
@@ -244,7 +254,7 @@ local function AutoFightMain()
 	elseif UltimateReady() and TargetIsBoss() then UseUltimate()
 	-- elseif not TargetHas("Minor Magickasteal") and TargetIsHostileNpc() then WeaveAbility(3)
 	-- elseif not IHave("Major Resolve") then WeaveAbility(5)
-	elseif Magicka()>89 then WeaveAbility(2)
+	elseif SomeoneCouldUseRegen() and Magicka()>50 then WeaveAbility(2)
 	-- elseif TargetIsHostileNpc() and not TargetHas("Minor Lifesteal") then WeaveAbility(5)
 	elseif TargetIsHostileNpc() and not Blocking() then HeavyAttack()
 	else DoNothing()
