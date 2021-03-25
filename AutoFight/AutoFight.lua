@@ -237,11 +237,18 @@ local function SomeoneCouldUseRegen()
 	local GroupSize = GetGroupSize()
 	local unitTag
 	if GroupSize > 0 then
+		local GroupMembersWithPlentyOfRegen = 0
+		local GroupMembersInSupportRange = 0
 		for i = 1, GroupSize do
 			unitTag = GetGroupUnitTagByIndex(i)
-			if not UnitHasBuffTimeLeft(unitTag,"Radiating Regeneration",5000) and IsUnitInGroupSupportRange(unitTag) and not IsUnitDead(unitTag) and GetUnitType(unitTag) == 1 then return true end
+			if IsUnitInGroupSupportRange(unitTag) and not IsUnitDead(unitTag) and GetUnitType(unitTag) == 1 then
+				GroupMembersInSupportRange = GroupMembersInSupportRange + 1
+				if not UnitHasRegen(unitTag) then return true end
+				if UnitHasBuffTimeLeft(unitTag,"Radiating Regeneration",5000) then
+				GroupMembersWithPlentyOfRegen = GroupMembersWithPlentyOfRegen + 1 end
+			end
 		end
-		return false
+		return (GroupMembersWithPlentyOfRegen < 3 and GroupMembersWithPlentyOfRegen < GroupMembersInSupportRange)
 	else return (not UnitHasBuffTimeLeft("player","Radiating Regeneration",5000)) end
 end
 
