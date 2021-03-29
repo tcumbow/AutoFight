@@ -20,6 +20,10 @@ local function Health()
 	local MyHealth, MyMaxHealth = GetUnitPower('player', POWERTYPE_HEALTH)
 	return ((MyHealth/MyMaxHealth)*100)
 end
+local function HealthPoints()
+	local MyHealth, MyMaxHealth = GetUnitPower('player', POWERTYPE_HEALTH)
+	return MyHealth
+end
 local function Magicka()
 	local MyMagicka, MyMaxMagicka = GetUnitPower('player', POWERTYPE_MAGICKA)
 	return ((MyMagicka/MyMaxMagicka)*100)
