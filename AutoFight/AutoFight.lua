@@ -295,7 +295,7 @@ local function OnEventCombatEvent( eventCode, result, isError, abilityName, abil
 end
 
 --Suggested Logic Examples (for function AutoFightMain below)
---<TBD>
+--[Smart Blocking]: elseif AttackIncoming() and StaminaPoints()>BlockCost and (IncomingAttackIsNotBlockTested or (IncomingAttackPredictedDamage/HealthPoints())>(BlockCost/StaminaPoints())) then Block()
 
 -- END COMMON CODE 01
 
