@@ -265,11 +265,6 @@ local function OnEventCombatEvent( eventCode, result, isError, abilityName, abil
 						IncomingAttackAbilitySynId = abilitySynId
 						IncomingAttackSourceUnitId = sourceUnitId
 						IncomingAttackIsNotBlockTested = ((CanBeBlockedPerAbilitySynId[abilitySynId]~=true) and (nil==BlockTestsPerAbilitySynId[abilitySynId] or BlockTestsPerAbilitySynId[abilitySynId]<BLOCK_TEST_THRESHOLD))
-						if IncomingAttackIsNotBlockTested then
-							if nil==BlockTestsPerAbilitySynId[abilitySynId] then BlockTestsPerAbilitySynId[abilitySynId] = 1
-							else BlockTestsPerAbilitySynId[abilitySynId] = BlockTestsPerAbilitySynId[abilitySynId] + 1 end
-							d("AutoFight: learning about "..abilitySynId)
-						end
 					end
 				else
 					-- d("too fast: "..abilitySynId.." "..MinRecordedLagPerAbilitySynId[abilitySynId])
@@ -283,6 +278,11 @@ local function OnEventCombatEvent( eventCode, result, isError, abilityName, abil
 				if nil==MinRecordedLagPerAbilitySynId[abilitySynId] or MinRecordedLagPerAbilitySynId[abilitySynId]>Lag then MinRecordedLagPerAbilitySynId[abilitySynId]=Lag end
 				if nil==MaxRecordedLagPerAbilitySynId[abilitySynId] or MaxRecordedLagPerAbilitySynId[abilitySynId]<Lag then MaxRecordedLagPerAbilitySynId[abilitySynId]=Lag end
 				IncomingAttackETR = 0
+				if IncomingAttackIsNotBlockTested and result==ACTION_RESULT_DAMAGE and Blocking() then
+					if nil==BlockTestsPerAbilitySynId[abilitySynId] then BlockTestsPerAbilitySynId[abilitySynId] = 1
+					else BlockTestsPerAbilitySynId[abilitySynId] = BlockTestsPerAbilitySynId[abilitySynId] + 1 end
+					d("AutoFight: looks like this can't be blocked: "..abilitySynId)
+				end
 			end
 		end
 		if result==ACTION_RESULT_DAMAGE then
