@@ -231,11 +231,78 @@ local function DoNothing()
 	EndHeavyAttack()
 	EndBlock()
 end
+local IncomingAttackETA = 0
+local IncomingAttackETR = 0
+local IncomingAttackPredictedDamage = 0
+local IncomingAttackAbilitySynId = 0
+local IncomingAttackIsNotBlockTested = false
+local IncomingAttackSourceUnitId = 0
+local IncomingAttackBeginTimestamp = 0
+local MaxRecordedDamagePerAbilitySynId = { }
+local MinRecordedLagPerAbilitySynId = { }
+local MaxRecordedLagPerAbilitySynId = { }
+local CanBeBlockedPerAbilitySynId = { }
+local BlockTestsPerAbilitySynId = { }
+local LAG_THAT_IS_TOO_QUICK_TO_BLOCK = 120
+local BLOCK_TEST_THRESHOLD = 5
+local function AttackIncoming()
+	return (IncomingAttackETA-300<Now() and IncomingAttackETR+300>Now())
+end
+local function OnEventCombatEvent( eventCode, result, isError, abilityName, abilityGraphic, abilityActionSlotType, sourceName, sourceType, targetName, targetType, hitValue, powerType, damageType, log, sourceUnitId, targetUnitId, abilityId )
+	local abilitySynId = sourceName.." "..abilityName
+	if targetType==COMBAT_UNIT_TYPE_PLAYER and sourceType~=COMBAT_UNIT_TYPE_PLAYER then
+		if result==ACTION_RESULT_BEGIN then
+			if (CanBeBlockedPerAbilitySynId[abilitySynId] or nil==BlockTestsPerAbilitySynId[abilitySynId] or BlockTestsPerAbilitySynId[abilitySynId]<BLOCK_TEST_THRESHOLD) then
+				if (nil==MinRecordedLagPerAbilitySynId[abilitySynId] or MinRecordedLagPerAbilitySynId[abilitySynId] > LAG_THAT_IS_TOO_QUICK_TO_BLOCK) then
+					if ((not AttackIncoming()) or (abilitySynId~=IncomingAttackAbilitySynId and nil~=MaxRecordedDamagePerAbilitySynId[abilitySynId] and IncomingAttackPredictedDamage < MaxRecordedDamagePerAbilitySynId[abilitySynId])) then
+						IncomingAttackBeginTimestamp = Now()
+						if nil~=MinRecordedLagPerAbilitySynId[abilitySynId] then IncomingAttackETA = Now()+MinRecordedLagPerAbilitySynId[abilitySynId]
+						else IncomingAttackETA = Now() end
+						if nil~=MaxRecordedLagPerAbilitySynId[abilitySynId] then IncomingAttackETR = Now()+MaxRecordedLagPerAbilitySynId[abilitySynId]
+						else IncomingAttackETR = Now()+5000 end -- max duration assumption
+						if nil~=MaxRecordedDamagePerAbilitySynId[abilitySynId] then IncomingAttackPredictedDamage = MaxRecordedDamagePerAbilitySynId[abilitySynId]
+						else IncomingAttackPredictedDamage = 0 end
+						IncomingAttackAbilitySynId = abilitySynId
+						IncomingAttackSourceUnitId = sourceUnitId
+						IncomingAttackIsNotBlockTested = ((CanBeBlockedPerAbilitySynId[abilitySynId]~=true) and (nil==BlockTestsPerAbilitySynId[abilitySynId] or BlockTestsPerAbilitySynId[abilitySynId]<BLOCK_TEST_THRESHOLD))
+						if IncomingAttackIsNotBlockTested then
+							if nil==BlockTestsPerAbilitySynId[abilitySynId] then BlockTestsPerAbilitySynId[abilitySynId] = 1
+							else BlockTestsPerAbilitySynId[abilitySynId] = BlockTestsPerAbilitySynId[abilitySynId] + 1 end
+							d("AutoFight: learning about "..abilitySynId)
+						end
+					end
+				else
+					-- d("too fast: "..abilitySynId.." "..MinRecordedLagPerAbilitySynId[abilitySynId])
+				end
+			else
+				-- d("can't be blocked: "..abilitySynId)
+			end
+		elseif result==ACTION_RESULT_DAMAGE or result==ACTION_RESULT_BLOCKED_DAMAGE then
+			if (IncomingAttackETR+500>Now() and IncomingAttackSourceUnitId==sourceUnitId and IncomingAttackAbilitySynId==abilitySynId) then
+				local Lag = Now()-IncomingAttackBeginTimestamp
+				if nil==MinRecordedLagPerAbilitySynId[abilitySynId] or MinRecordedLagPerAbilitySynId[abilitySynId]>Lag then MinRecordedLagPerAbilitySynId[abilitySynId]=Lag end
+				if nil==MaxRecordedLagPerAbilitySynId[abilitySynId] or MaxRecordedLagPerAbilitySynId[abilitySynId]<Lag then MaxRecordedLagPerAbilitySynId[abilitySynId]=Lag end
+				IncomingAttackETR = 0
+			end
+		end
+		if result==ACTION_RESULT_DAMAGE then
+			if MaxRecordedDamagePerAbilitySynId[abilitySynId]==nil or hitValue > MaxRecordedDamagePerAbilitySynId[abilitySynId] then MaxRecordedDamagePerAbilitySynId[abilitySynId] = hitValue end
+		elseif result==ACTION_RESULT_BLOCKED_DAMAGE then
+			-- d("blocked: "..abilitySynId)
+			CanBeBlockedPerAbilitySynId[abilitySynId] = true
+		end
+	end
+end
+
+--Suggested Logic Examples (for function AutoFightMain below)
+--<TBD>
+
 -- END COMMON CODE 01
 
 -- START CHARACTER-SPECIFIC CODE 01
 
 local CharacterFirstName = "Gideon"
+local BlockCost = 2160
 
 local function SomeoneCouldUseRegen()
 	local GroupSize = GetGroupSize()
@@ -284,6 +351,7 @@ local function OnAddonLoaded(event, name)
 		EVENT_MANAGER:UnregisterForEvent(ADDON_NAME, event)
 		if string.find(GetUnitName("player"),CharacterFirstName) then
 			EVENT_MANAGER:RegisterForUpdate(ADDON_NAME, 100, AutoFightMain)
+			EVENT_MANAGER:RegisterForEvent(ADDON_NAME, EVENT_COMBAT_EVENT, OnEventCombatEvent)
 		end
 	end
 end
