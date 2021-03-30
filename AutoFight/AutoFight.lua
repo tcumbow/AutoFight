@@ -233,7 +233,7 @@ local function DoNothing()
 end
 local IncomingAttackETA = 0
 local IncomingAttackETR = 0
-local IncomingAttackPredictedDamage = 0
+local IncomingAttackPredictedDamage = 1
 local IncomingAttackAbilitySynId = 0
 local IncomingAttackIsNotBlockTested = false
 local IncomingAttackSourceUnitId = 0
@@ -261,7 +261,7 @@ local function OnEventCombatEvent( eventCode, result, isError, abilityName, abil
 						if nil~=MaxRecordedLagPerAbilitySynId[abilitySynId] then IncomingAttackETR = Now()+MaxRecordedLagPerAbilitySynId[abilitySynId]
 						else IncomingAttackETR = Now()+5000 end -- max duration assumption
 						if nil~=MaxRecordedDamagePerAbilitySynId[abilitySynId] then IncomingAttackPredictedDamage = MaxRecordedDamagePerAbilitySynId[abilitySynId]
-						else IncomingAttackPredictedDamage = 0 end
+						else IncomingAttackPredictedDamage = 1 end
 						IncomingAttackAbilitySynId = abilitySynId
 						IncomingAttackSourceUnitId = sourceUnitId
 						IncomingAttackIsNotBlockTested = ((CanBeBlockedPerAbilitySynId[abilitySynId]~=true) and (nil==BlockTestsPerAbilitySynId[abilitySynId] or BlockTestsPerAbilitySynId[abilitySynId]<BLOCK_TEST_THRESHOLD))
