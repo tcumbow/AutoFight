@@ -249,9 +249,9 @@ local function AttackIncoming()
 	return (IncomingAttackETA-300<Now() and IncomingAttackETR+300>Now())
 end
 local function OnEventCombatEvent( eventCode, result, isError, abilityName, abilityGraphic, abilityActionSlotType, sourceName, sourceType, targetName, targetType, hitValue, powerType, damageType, log, sourceUnitId, targetUnitId, abilityId )
-	local abilitySynId = sourceName.." "..abilityName
-	local sourceSynId = sourceName.." "..sourceUnitId
 	if targetType==COMBAT_UNIT_TYPE_PLAYER and sourceType~=COMBAT_UNIT_TYPE_PLAYER then
+		local abilitySynId = sourceName.." "..abilityName
+		local sourceSynId = sourceName.." "..sourceUnitId
 		if result==ACTION_RESULT_BEGIN then
 			if (CanBeBlockedPerAbilitySynId[abilitySynId] or nil==BlockTestsPerAbilitySynId[abilitySynId] or BlockTestsPerAbilitySynId[abilitySynId]<BLOCK_TEST_THRESHOLD) then
 				if (nil==MinRecordedLagPerAbilitySynId[abilitySynId] or MinRecordedLagPerAbilitySynId[abilitySynId] > LAG_THAT_IS_TOO_QUICK_TO_BLOCK) then
