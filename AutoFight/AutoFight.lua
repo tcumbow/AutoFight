@@ -281,7 +281,7 @@ local function OnEventCombatEvent( eventCode, result, isError, abilityName, abil
 				if IncomingAttackIsNotBlockTested and result==ACTION_RESULT_DAMAGE and Blocking() then
 					if nil==BlockTestsPerAbilitySynId[abilitySynId] then BlockTestsPerAbilitySynId[abilitySynId] = 1
 					else BlockTestsPerAbilitySynId[abilitySynId] = BlockTestsPerAbilitySynId[abilitySynId] + 1 end
-					d("AutoFight: looks like this can't be blocked: "..abilitySynId)
+					if BlockTestsPerAbilitySynId[abilitySynId]==BLOCK_TEST_THRESHOLD then d("AutoFight: learned to NOT block: "..abilitySynId) end
 				end
 			end
 		end
@@ -289,7 +289,10 @@ local function OnEventCombatEvent( eventCode, result, isError, abilityName, abil
 			if MaxRecordedDamagePerAbilitySynId[abilitySynId]==nil or hitValue > MaxRecordedDamagePerAbilitySynId[abilitySynId] then MaxRecordedDamagePerAbilitySynId[abilitySynId] = hitValue end
 		elseif result==ACTION_RESULT_BLOCKED_DAMAGE then
 			-- d("blocked: "..abilitySynId)
-			CanBeBlockedPerAbilitySynId[abilitySynId] = true
+			if CanBeBlockedPerAbilitySynId[abilitySynId] ~= true then
+				CanBeBlockedPerAbilitySynId[abilitySynId] = true
+				d("AutoFight: learned to block: "..abilitySynId)
+			end
 		end
 	end
 end
