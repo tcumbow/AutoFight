@@ -250,6 +250,7 @@ local function AttackIncoming()
 end
 local function OnEventCombatEvent( eventCode, result, isError, abilityName, abilityGraphic, abilityActionSlotType, sourceName, sourceType, targetName, targetType, hitValue, powerType, damageType, log, sourceUnitId, targetUnitId, abilityId )
 	local abilitySynId = sourceName.." "..abilityName
+	local sourceSynId = sourceName.." "..sourceUnitId
 	if targetType==COMBAT_UNIT_TYPE_PLAYER and sourceType~=COMBAT_UNIT_TYPE_PLAYER then
 		if result==ACTION_RESULT_BEGIN then
 			if (CanBeBlockedPerAbilitySynId[abilitySynId] or nil==BlockTestsPerAbilitySynId[abilitySynId] or BlockTestsPerAbilitySynId[abilitySynId]<BLOCK_TEST_THRESHOLD) then
