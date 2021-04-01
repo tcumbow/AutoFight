@@ -231,6 +231,9 @@ local function DoNothing()
 	EndHeavyAttack()
 	EndBlock()
 end
+local LastWarningSignPerSourceSynId = { } --each "WarningSign" is a table that consists of two keys: "AbilitySynId" and "Timestamp"
+local ThreatPerSourceSynId = { } --each "Threat" is a table that consists of these keys: "ETA","ETR","ThreatProfile" (which itself is a table)
+local ThreatProfilePerWarningAbilitySynId = { } --each "ThreatProfile" is a table that consists of these keys: "CanBeBlocked","PredictedDamage","CausesStagger","TriedBlocking","MinLag","MaxLag"
 local IncomingAttackETA = 0
 local IncomingAttackETR = 0
 local IncomingAttackPredictedDamage = 1
@@ -245,56 +248,72 @@ local CanBeBlockedPerAbilitySynId = { }
 local BlockTestsPerAbilitySynId = { }
 local LAG_THAT_IS_TOO_QUICK_TO_BLOCK = 120
 local BLOCK_TEST_THRESHOLD = 5
+local ASSUMED_MAX_LAG_OF_WARNING = 5000
 local function AttackIncoming()
 	return (IncomingAttackETA-300<Now() and IncomingAttackETR+300>Now())
 end
 local function OnEventCombatEvent( eventCode, result, isError, abilityName, abilityGraphic, abilityActionSlotType, sourceName, sourceType, targetName, targetType, hitValue, powerType, damageType, log, sourceUnitId, targetUnitId, abilityId )
 	if targetType==COMBAT_UNIT_TYPE_PLAYER and sourceType~=COMBAT_UNIT_TYPE_PLAYER then
+		
+		--enrich data
+		local now = Now()
 		local abilitySynId = sourceName.." "..abilityName
 		local sourceSynId = sourceName.." "..sourceUnitId
+		
 		if result==ACTION_RESULT_BEGIN then
-			if (CanBeBlockedPerAbilitySynId[abilitySynId] or nil==BlockTestsPerAbilitySynId[abilitySynId] or BlockTestsPerAbilitySynId[abilitySynId]<BLOCK_TEST_THRESHOLD) then
-				if (nil==MinRecordedLagPerAbilitySynId[abilitySynId] or MinRecordedLagPerAbilitySynId[abilitySynId] > LAG_THAT_IS_TOO_QUICK_TO_BLOCK) then
-					if ((not AttackIncoming()) or (abilitySynId~=IncomingAttackAbilitySynId and nil~=MaxRecordedDamagePerAbilitySynId[abilitySynId] and IncomingAttackPredictedDamage < MaxRecordedDamagePerAbilitySynId[abilitySynId])) then
-						IncomingAttackBeginTimestamp = Now()
-						if nil~=MinRecordedLagPerAbilitySynId[abilitySynId] then IncomingAttackETA = Now()+MinRecordedLagPerAbilitySynId[abilitySynId]
-						else IncomingAttackETA = Now() end
-						if nil~=MaxRecordedLagPerAbilitySynId[abilitySynId] then IncomingAttackETR = Now()+MaxRecordedLagPerAbilitySynId[abilitySynId]
-						else IncomingAttackETR = Now()+5000 end -- max duration assumption
-						if nil~=MaxRecordedDamagePerAbilitySynId[abilitySynId] then IncomingAttackPredictedDamage = MaxRecordedDamagePerAbilitySynId[abilitySynId]
-						else IncomingAttackPredictedDamage = 1 end
-						IncomingAttackAbilitySynId = abilitySynId
-						IncomingAttackSourceUnitId = sourceUnitId
-						IncomingAttackIsNotBlockTested = ((CanBeBlockedPerAbilitySynId[abilitySynId]~=true) and (nil==BlockTestsPerAbilitySynId[abilitySynId] or BlockTestsPerAbilitySynId[abilitySynId]<BLOCK_TEST_THRESHOLD))
+
+			--record warning information for later use
+			if LastWarningSignPerSourceSynId[sourceSynId] == nil then LastWarningSignPerSourceSynId[sourceSynId] = { } end
+			LastWarningSignPerSourceSynId[sourceSynId].AbilitySynId = abilitySynId
+			LastWarningSignPerSourceSynId[sourceSynId].Timestamp = now
+
+			--identify threats (generate predictions) based on this "begin" event
+			local threatProfile = ThreatProfilePerWarningAbilitySynId[abilitySynId] or { }
+			ThreatPerSourceSynId[sourceSynId] = ThreatPerSourceSynId[sourceSynId] or { }
+			ThreatPerSourceSynId[sourceSynId].ThreatProfile = threatProfile
+			if threatProfile.MinLag~=nil then ThreatPerSourceSynId[sourceSynId].ETA = now+threatProfile.MinLag
+			else ThreatPerSourceSynId[sourceSynId].ETA = now end
+			if threatProfile.MaxLag~=nil then ThreatPerSourceSynId[sourceSynId].ETR = now+threatProfile.MaxLag
+			else ThreatPerSourceSynId[sourceSynId].ETR = now+ASSUMED_MAX_LAG_OF_WARNING end
+
+		elseif result==ACTION_RESULT_DAMAGE or result==ACTION_RESULT_BLOCKED_DAMAGE or result==ACTION_RESULT_STAGGERED then
+
+			--see if there is a valid corresponding WarningSign...
+			local lastWarningSign = LastWarningSignPerSourceSynId[sourceSynId]
+			if lastWarningSign ~= nil then
+				if lastWarningSign.Timestamp + ASSUMED_MAX_LAG_OF_WARNING > now then
+					--...if so, learn about it
+					ThreatProfilePerWarningAbilitySynId[lastWarningSign.AbilitySynId] = ThreatProfilePerWarningAbilitySynId[lastWarningSign.AbilitySynId] or { }
+					local threatProfile = ThreatProfilePerWarningAbilitySynId[lastWarningSign.AbilitySynId]
+					local observedLag = now - lastWarningSign.Timestamp
+					if threatProfile.MinLag==nil or observedLag < threatProfile.MinLag then ThreatProfilePerWarningAbilitySynId[lastWarningSign.AbilitySynId].MinLag = observedLag end
+					if threatProfile.MaxLag==nil or observedLag > threatProfile.MaxLag then ThreatProfilePerWarningAbilitySynId[lastWarningSign.AbilitySynId].MaxLag = observedLag end
+					if result==ACTION_RESULT_STAGGERED then ThreatProfilePerWarningAbilitySynId[lastWarningSign.AbilitySynId].CausesStagger = true
+					elseif result==ACTION_RESULT_BLOCKED_DAMAGE then ThreatProfilePerWarningAbilitySynId[lastWarningSign.AbilitySynId].CanBeBlocked = true
+					elseif result==ACTION_RESULT_DAMAGE then
+						if threatProfile.PredictedDamage == nil then ThreatProfilePerWarningAbilitySynId[lastWarningSign.AbilitySynId].PredictedDamage = hitValue
+						else ThreatProfilePerWarningAbilitySynId[lastWarningSign.AbilitySynId].PredictedDamage = ((hitValue+threatProfile.PredictedDamage)/2)
+						end
+						if Blocking() and BlockInProgress() then ThreatProfilePerWarningAbilitySynId[lastWarningSign.AbilitySynId].CanBeBlocked = false end
 					end
-				else
-					-- d("too fast: "..abilitySynId.." "..MinRecordedLagPerAbilitySynId[abilitySynId])
-				end
-			else
-				-- d("can't be blocked: "..abilitySynId)
-			end
-		elseif result==ACTION_RESULT_DAMAGE or result==ACTION_RESULT_BLOCKED_DAMAGE then
-			if (IncomingAttackETR+500>Now() and IncomingAttackSourceUnitId==sourceUnitId and IncomingAttackAbilitySynId==abilitySynId) then
-				local Lag = Now()-IncomingAttackBeginTimestamp
-				if nil==MinRecordedLagPerAbilitySynId[abilitySynId] or MinRecordedLagPerAbilitySynId[abilitySynId]>Lag then MinRecordedLagPerAbilitySynId[abilitySynId]=Lag end
-				if nil==MaxRecordedLagPerAbilitySynId[abilitySynId] or MaxRecordedLagPerAbilitySynId[abilitySynId]<Lag then MaxRecordedLagPerAbilitySynId[abilitySynId]=Lag end
-				IncomingAttackETR = 0
-				if IncomingAttackIsNotBlockTested and result==ACTION_RESULT_DAMAGE and Blocking() then
-					if nil==BlockTestsPerAbilitySynId[abilitySynId] then BlockTestsPerAbilitySynId[abilitySynId] = 1
-					else BlockTestsPerAbilitySynId[abilitySynId] = BlockTestsPerAbilitySynId[abilitySynId] + 1 end
-					if BlockTestsPerAbilitySynId[abilitySynId]==BLOCK_TEST_THRESHOLD then d("AutoFight: learned to NOT block: "..abilitySynId) end
 				end
 			end
+
+			--delete any threats (predictions) for this sourceSynId, cuz shit has already gone down
+			ThreatPerSourceSynId[sourceSynId] = nil
+
+			--delete WarningSign for this sourceSynId, cuz shit has already gone down and we already learned from it
+			-- LastWarningSignPerSourceSynId[sourceSynId] = nil
+
 		end
-		if result==ACTION_RESULT_DAMAGE then
-			if MaxRecordedDamagePerAbilitySynId[abilitySynId]==nil or hitValue > MaxRecordedDamagePerAbilitySynId[abilitySynId] then MaxRecordedDamagePerAbilitySynId[abilitySynId] = hitValue end
-		elseif result==ACTION_RESULT_BLOCKED_DAMAGE then
-			-- d("blocked: "..abilitySynId)
-			if CanBeBlockedPerAbilitySynId[abilitySynId] ~= true then
-				CanBeBlockedPerAbilitySynId[abilitySynId] = true
-				d("AutoFight: learned to block: "..abilitySynId)
-			end
-		end
+	end
+end
+local function ReciteThreats()
+	d("---------------")
+	for key, value in pairs(ThreatPerSourceSynId) do
+		d("-------")
+		d(key)
+		d(value)
 	end
 end
 
@@ -358,6 +377,7 @@ local function OnAddonLoaded(event, name)
 		EVENT_MANAGER:UnregisterForEvent(ADDON_NAME, event)
 		if string.find(GetUnitName("player"),CharacterFirstName) then
 			EVENT_MANAGER:RegisterForUpdate(ADDON_NAME, 100, AutoFightMain)
+			EVENT_MANAGER:RegisterForUpdate(ADDON_NAME.."blarg", 1000, ReciteThreats)
 			EVENT_MANAGER:RegisterForEvent(ADDON_NAME, EVENT_COMBAT_EVENT, OnEventCombatEvent)
 		end
 	end
