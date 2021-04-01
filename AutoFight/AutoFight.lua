@@ -238,25 +238,34 @@ local IncomingAttackETA = 0
 local IncomingAttackETR = 0
 local LAG_THAT_IS_TOO_QUICK_TO_BLOCK = 120
 local ASSUMED_MAX_LAG_OF_WARNING = 5000
-local function ShouldBlock(blockCost)
+local BlockCost = 2160
+local function ShouldBlock()
 	local now = Now()
-	if StaminaPoints()<blockCost then return false end
+	if StaminaPoints()<BlockCost then return false end
 	for key, value in pairs(ThreatPerSourceSynId) do
 		if now > value.ETR+300 then ThreatPerSourceSynId[key] = nil
 		else
 			if now > value.ETA-300 then
 				if value.CanBeBlocked ~= false then
 					if (value.ThreatProfile.MinLag or 1000) > LAG_THAT_IS_TOO_QUICK_TO_BLOCK then
-						
+						if (value.ThreatProfile.CausesStagger) then
+							d("PREVENTING STAGGER")
+							return true
+						else
+							d("blocking anyway")
+							return true
+						end
+					else d("TOO QUICK "..LastWarningSignPerSourceSynId[key].AbilitySynId)
 					end
+				else d("CANNOT BLOCK "..LastWarningSignPerSourceSynId[key].AbilitySynId)
 				end
 			end
 		end
 	end
 	return false
 
-	taminaPoints()>BlockCost and (IncomingAttackIsNotBlockTested or (IncomingAttackPredictedDamage/HealthPoints())>(BlockCost/StaminaPoints())) then Block()
-	return (IncomingAttackETA-300<Now() and IncomingAttackETR+300>Now())
+	-- taminaPoints()>BlockCost and (IncomingAttackIsNotBlockTested or (IncomingAttackPredictedDamage/HealthPoints())>(BlockCost/StaminaPoints())) then Block()
+	-- return (IncomingAttackETA-300<Now() and IncomingAttackETR+300>Now())
 end
 local function OnEventCombatEvent( eventCode, result, isError, abilityName, abilityGraphic, abilityActionSlotType, sourceName, sourceType, targetName, targetType, hitValue, powerType, damageType, log, sourceUnitId, targetUnitId, abilityId )
 	if targetType==COMBAT_UNIT_TYPE_PLAYER and sourceType~=COMBAT_UNIT_TYPE_PLAYER then
@@ -333,7 +342,7 @@ end
 -- START CHARACTER-SPECIFIC CODE 01
 
 local CharacterFirstName = "Gideon"
-local BlockCost = 2160
+BlockCost = 2160
 
 local function SomeoneCouldUseRegen()
 	local GroupSize = GetGroupSize()
@@ -360,15 +369,16 @@ local function AutoFightMain()
 	elseif LowestGroupHealthPercent()<40 then UseAbility(1)
 	elseif LowestGroupHealthPercent()<70 and Magicka()>70 then UseAbility(1)
 	elseif LowestGroupHealthPercentWithoutRegen()<80 then UseAbility(2)
-	elseif LowestGroupHealthPercentWithoutRegen()<90 then WeaveAbility(2)
+	elseif ShouldBlock() then Block()
+	-- elseif LowestGroupHealthPercentWithoutRegen()<90 then WeaveAbility(2)
 	-- elseif not IHave("Minor Sorcery") and TargetIsHostileNpc() and Magicka()>80 then WeaveAbility(5)
-	elseif UltimateReady() and TargetIsBoss() then UseUltimate()
+	-- elseif UltimateReady() and TargetIsBoss() then UseUltimate()
 	-- elseif not TargetHas("Minor Magickasteal") and TargetIsHostileNpc() then WeaveAbility(3)
 	-- elseif not IHave("Major Resolve") then WeaveAbility(5)
-	elseif SomeoneCouldUseRegen() and Magicka()>50 then WeaveAbility(2)
+	-- elseif SomeoneCouldUseRegen() and Magicka()>50 then WeaveAbility(2)
 	-- elseif TargetIsHostileNpc() and not TargetHas("Minor Lifesteal") then WeaveAbility(5)
-	elseif Magicka()>99 then WeaveAbility(5)
-	elseif TargetIsHostileNpc() and not Blocking() then HeavyAttack()
+	-- elseif Magicka()>99 then WeaveAbility(5)
+	-- elseif TargetIsHostileNpc() and not Blocking() then HeavyAttack()
 	else DoNothing()
 	end
 end
@@ -383,7 +393,7 @@ local function OnAddonLoaded(event, name)
 		EVENT_MANAGER:UnregisterForEvent(ADDON_NAME, event)
 		if string.find(GetUnitName("player"),CharacterFirstName) then
 			EVENT_MANAGER:RegisterForUpdate(ADDON_NAME, 100, AutoFightMain)
-			EVENT_MANAGER:RegisterForUpdate(ADDON_NAME.."blarg", 1000, ReciteThreats)
+			-- EVENT_MANAGER:RegisterForUpdate(ADDON_NAME.."blarg", 1000, ReciteThreats)
 			EVENT_MANAGER:RegisterForEvent(ADDON_NAME, EVENT_COMBAT_EVENT, OnEventCombatEvent)
 		end
 	end
