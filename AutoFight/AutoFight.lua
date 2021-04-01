@@ -291,9 +291,7 @@ local function OnEventCombatEvent( eventCode, result, isError, abilityName, abil
 					if result==ACTION_RESULT_STAGGERED then ThreatProfilePerWarningAbilitySynId[lastWarningSign.AbilitySynId].CausesStagger = true
 					elseif result==ACTION_RESULT_BLOCKED_DAMAGE then ThreatProfilePerWarningAbilitySynId[lastWarningSign.AbilitySynId].CanBeBlocked = true
 					elseif result==ACTION_RESULT_DAMAGE then
-						if threatProfile.PredictedDamage == nil then ThreatProfilePerWarningAbilitySynId[lastWarningSign.AbilitySynId].PredictedDamage = hitValue
-						else ThreatProfilePerWarningAbilitySynId[lastWarningSign.AbilitySynId].PredictedDamage = ((hitValue+threatProfile.PredictedDamage)/2)
-						end
+						if threatProfile.PredictedDamage == nil or hitValue > threatProfile.PredictedDamage then ThreatProfilePerWarningAbilitySynId[lastWarningSign.AbilitySynId].PredictedDamage = hitValue end
 						if Blocking() and BlockInProgress() then ThreatProfilePerWarningAbilitySynId[lastWarningSign.AbilitySynId].CanBeBlocked = false end
 					end
 				end
