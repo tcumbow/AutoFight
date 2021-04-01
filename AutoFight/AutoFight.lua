@@ -238,7 +238,24 @@ local IncomingAttackETA = 0
 local IncomingAttackETR = 0
 local LAG_THAT_IS_TOO_QUICK_TO_BLOCK = 120
 local ASSUMED_MAX_LAG_OF_WARNING = 5000
-local function AttackIncoming()
+local function ShouldBlock(blockCost)
+	local now = Now()
+	if StaminaPoints()<blockCost then return false end
+	for key, value in pairs(ThreatPerSourceSynId) do
+		if now > value.ETR+300 then ThreatPerSourceSynId[key] = nil
+		else
+			if now > value.ETA-300 then
+				if value.CanBeBlocked ~= false then
+					if (value.ThreatProfile.MinLag or 1000) > LAG_THAT_IS_TOO_QUICK_TO_BLOCK then
+						
+					end
+				end
+			end
+		end
+	end
+	return false
+
+	taminaPoints()>BlockCost and (IncomingAttackIsNotBlockTested or (IncomingAttackPredictedDamage/HealthPoints())>(BlockCost/StaminaPoints())) then Block()
 	return (IncomingAttackETA-300<Now() and IncomingAttackETR+300>Now())
 end
 local function OnEventCombatEvent( eventCode, result, isError, abilityName, abilityGraphic, abilityActionSlotType, sourceName, sourceType, targetName, targetType, hitValue, powerType, damageType, log, sourceUnitId, targetUnitId, abilityId )
@@ -343,7 +360,6 @@ local function AutoFightMain()
 	elseif LowestGroupHealthPercent()<40 then UseAbility(1)
 	elseif LowestGroupHealthPercent()<70 and Magicka()>70 then UseAbility(1)
 	elseif LowestGroupHealthPercentWithoutRegen()<80 then UseAbility(2)
-	elseif AttackIncoming() and StaminaPoints()>BlockCost and (IncomingAttackIsNotBlockTested or (IncomingAttackPredictedDamage/HealthPoints())>(BlockCost/StaminaPoints())) then Block()
 	elseif LowestGroupHealthPercentWithoutRegen()<90 then WeaveAbility(2)
 	-- elseif not IHave("Minor Sorcery") and TargetIsHostileNpc() and Magicka()>80 then WeaveAbility(5)
 	elseif UltimateReady() and TargetIsBoss() then UseUltimate()
@@ -353,7 +369,6 @@ local function AutoFightMain()
 	-- elseif TargetIsHostileNpc() and not TargetHas("Minor Lifesteal") then WeaveAbility(5)
 	elseif Magicka()>99 then WeaveAbility(5)
 	elseif TargetIsHostileNpc() and not Blocking() then HeavyAttack()
-	elseif AttackIncoming() and StaminaPoints()>BlockCost and (IncomingAttackIsNotBlockTested or (IncomingAttackPredictedDamage/HealthPoints())>0.5*(BlockCost/StaminaPoints())) then Block()
 	else DoNothing()
 	end
 end
