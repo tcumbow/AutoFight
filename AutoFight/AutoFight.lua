@@ -312,6 +312,10 @@ local function ReciteThreats()
 		d("-------")
 		d(key)
 		d(value)
+		d(value.ThreatProfile)
+		if value.ETR > Now() then
+			ThreatPerSourceSynId[key] = nil
+		end
 	end
 end
 
