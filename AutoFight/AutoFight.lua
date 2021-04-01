@@ -236,18 +236,7 @@ local ThreatPerSourceSynId = { } --each "Threat" is a table that consists of the
 local ThreatProfilePerWarningAbilitySynId = { } --each "ThreatProfile" is a table that consists of these keys: "CanBeBlocked","PredictedDamage","CausesStagger","TriedBlocking","MinLag","MaxLag"
 local IncomingAttackETA = 0
 local IncomingAttackETR = 0
-local IncomingAttackPredictedDamage = 1
-local IncomingAttackAbilitySynId = 0
-local IncomingAttackIsNotBlockTested = false
-local IncomingAttackSourceUnitId = 0
-local IncomingAttackBeginTimestamp = 0
-local MaxRecordedDamagePerAbilitySynId = { }
-local MinRecordedLagPerAbilitySynId = { }
-local MaxRecordedLagPerAbilitySynId = { }
-local CanBeBlockedPerAbilitySynId = { }
-local BlockTestsPerAbilitySynId = { }
 local LAG_THAT_IS_TOO_QUICK_TO_BLOCK = 120
-local BLOCK_TEST_THRESHOLD = 5
 local ASSUMED_MAX_LAG_OF_WARNING = 5000
 local function AttackIncoming()
 	return (IncomingAttackETA-300<Now() and IncomingAttackETR+300>Now())
