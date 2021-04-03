@@ -184,7 +184,7 @@ local function AutoFightMain()
 	elseif UltimateReady() and TargetIsHostileNpc() then UseUltimate()
 	elseif not IHave("Major Sorcery") then WeaveAbility(4)
 	elseif not IHave("Major Prophecy") then WeaveAbility(3)
-	elseif Magicka()>99 and TargetIsHostileNpc() and not Blocking() then WeaveAbility(1)
+	elseif Magicka()>90 and TargetIsHostileNpc() and not Blocking() then WeaveAbility(1)
 	elseif TargetIsHostileNpc() and not Blocking() then HeavyAttack()
 	else DoNothing()
 	end
