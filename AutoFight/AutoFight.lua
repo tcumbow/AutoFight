@@ -231,8 +231,9 @@ local function DoNothing()
 	EndHeavyAttack()
 	EndBlock()
 end
-local LastWarningSignPerSourceSynId = { } --each "WarningSign" is a table that consists of two keys: "AbilitySynId" and "Timestamp"
+local LastBeginWarningSignPerSourceSynId = { } --each "WarningSign" is a table that consists of two keys: "AbilitySynId" and "Timestamp"
 local ThreatProfilePerWarningAbilitySynId = { } --each "ThreatProfile" is a table that consists of these keys: "CanBeBlocked","PredictedDamage","CausesStagger","TriedBlocking","MinDmgLag","MaxDmgLag"
+local ThreatProfilePerWarningId = { }
 local LAG_THAT_IS_TOO_QUICK_TO_BLOCK = 120
 local ASSUMED_MAX_LAG_OF_WARNING = 5000
 local BlockCost = 2160
@@ -244,13 +245,13 @@ local function ShouldBlock()
 	local StagETA
 	local StagETR
 	if StaminaPoints()<BlockCost then return false end
-	for key, value in pairs(LastWarningSignPerSourceSynId) do
+	for key, value in pairs(LastBeginWarningSignPerSourceSynId) do
 		threat = ThreatProfilePerWarningAbilitySynId[value.AbilitySynId] or { }
 		DmgETA = (threat.MinDmgLag or 0) + value.Timestamp - 300
 		DmgETR = (threat.MaxDmgLag or ASSUMED_MAX_LAG_OF_WARNING) + value.Timestamp + 300
 		StagETA = (threat.MinStagLag or 0) + value.Timestamp - 300
 		StagETR = (threat.MaxStagLag or ASSUMED_MAX_LAG_OF_WARNING) + value.Timestamp + 300
-		if now > DmgETR and now > StagETR then LastWarningSignPerSourceSynId[key] = nil
+		if now > DmgETR and now > StagETR then LastBeginWarningSignPerSourceSynId[key] = nil
 		else
 			if threat.CanBeBlocked ~= false then
 				if threat.CausesStagger then
@@ -279,6 +280,18 @@ local function ShouldBlock()
 	-- taminaPoints()>BlockCost and (IncomingAttackIsNotBlockTested or (IncomingAttackPredictedDamage/HealthPoints())>(BlockCost/StaminaPoints())) then Block()
 	-- return (IncomingAttackETA-300<Now() and IncomingAttackETR+300>Now())
 end
+local function LearnFromWarningSign(sourceSynId)
+	local warning = LastBeginWarningSignPerSourceSynId[sourceSynId] or nil
+	local threatProfile = ThreatProfilePerWarningId[]
+	if warning.BlockedAnything then
+		
+	end
+end
+local function CleanUpBeginWarningSigns()
+	for key, value in pairs(t) do
+		
+	end
+end
 local function OnEventCombatEvent( eventCode, result, isError, abilityName, abilityGraphic, abilityActionSlotType, sourceName, sourceType, targetName, targetType, hitValue, powerType, damageType, log, sourceUnitId, targetUnitId, abilityId )
 	if targetType==COMBAT_UNIT_TYPE_PLAYER and sourceType~=COMBAT_UNIT_TYPE_PLAYER then
 		
@@ -288,56 +301,25 @@ local function OnEventCombatEvent( eventCode, result, isError, abilityName, abil
 		local sourceSynId = sourceName.." "..sourceUnitId
 		
 		if result==ACTION_RESULT_BEGIN then
-
 			--record warning information for later use
-			if LastWarningSignPerSourceSynId[sourceSynId] == nil then LastWarningSignPerSourceSynId[sourceSynId] = { } end
-			if (LastWarningSignPerSourceSynId[sourceSynId].AbilitySynId or "DummyVal") ~= abilitySynId then
-				LastWarningSignPerSourceSynId[sourceSynId].AbilitySynId = abilitySynId
-				LastWarningSignPerSourceSynId[sourceSynId].Timestamp = now
+			LastBeginWarningSignPerSourceSynId[sourceSynId] = LastBeginWarningSignPerSourceSynId[sourceSynId] or { }
+			if (LastBeginWarningSignPerSourceSynId[sourceSynId].AbilitySynId or "DummyVal") ~= abilitySynId then
+				LearnFromWarningSign(sourceSynId)
+				LastBeginWarningSignPerSourceSynId[sourceSynId].AbilitySynId = abilitySynId
+				LastBeginWarningSignPerSourceSynId[sourceSynId].AbilityId = abilityId
+				LastBeginWarningSignPerSourceSynId[sourceSynId].Timestamp = now
+				LastBeginWarningSignPerSourceSynId[sourceSynId].BlockedAnything = false
+				LastBeginWarningSignPerSourceSynId[sourceSynId].BlockedTimestamp = nil
+				LastBeginWarningSignPerSourceSynId[sourceSynId].GotStaggered = false
 			end
-
 		elseif result==ACTION_RESULT_DAMAGE or result==ACTION_RESULT_BLOCKED_DAMAGE or result==ACTION_RESULT_STAGGERED then
-
-			--see if there is a valid corresponding WarningSign...
-			local lastWarningSign = LastWarningSignPerSourceSynId[sourceSynId]
-			if lastWarningSign ~= nil then
-				if lastWarningSign.Timestamp + ASSUMED_MAX_LAG_OF_WARNING > now then
-					--...if so, learn about it
-					ThreatProfilePerWarningAbilitySynId[lastWarningSign.AbilitySynId] = ThreatProfilePerWarningAbilitySynId[lastWarningSign.AbilitySynId] or { }
-					local threatProfile = ThreatProfilePerWarningAbilitySynId[lastWarningSign.AbilitySynId]
-					local observedLag = now - lastWarningSign.Timestamp
-					if result==ACTION_RESULT_STAGGERED then
-						ThreatProfilePerWarningAbilitySynId[lastWarningSign.AbilitySynId].CausesStagger = true
-						if threatProfile.MinStagLag==nil or observedLag < threatProfile.MinStagLag then ThreatProfilePerWarningAbilitySynId[lastWarningSign.AbilitySynId].MinStagLag = observedLag end
-						if threatProfile.MaxStagLag==nil or observedLag > threatProfile.MaxStagLag then ThreatProfilePerWarningAbilitySynId[lastWarningSign.AbilitySynId].MaxStagLag = observedLag end
-						d("GOT STAGGERED BY "..abilitySynId)
-					elseif result==ACTION_RESULT_BLOCKED_DAMAGE then
-						if abilitySynId == lastWarningSign.AbilitySynId then ThreatProfilePerWarningAbilitySynId[abilitySynId].CanBeBlocked = true end
-						if threatProfile.MinDmgLag==nil or observedLag < threatProfile.MinDmgLag then ThreatProfilePerWarningAbilitySynId[lastWarningSign.AbilitySynId].MinDmgLag = observedLag end
-						if threatProfile.MaxDmgLag==nil or observedLag > threatProfile.MaxDmgLag then ThreatProfilePerWarningAbilitySynId[lastWarningSign.AbilitySynId].MaxDmgLag = observedLag end
-					elseif result==ACTION_RESULT_DAMAGE then
-						if threatProfile.MinDmgLag==nil or observedLag < threatProfile.MinDmgLag then ThreatProfilePerWarningAbilitySynId[lastWarningSign.AbilitySynId].MinDmgLag = observedLag end --TODO consolidate with above
-						if threatProfile.MaxDmgLag==nil or observedLag > threatProfile.MaxDmgLag then ThreatProfilePerWarningAbilitySynId[lastWarningSign.AbilitySynId].MaxDmgLag = observedLag end --TODO consolidate with above
-						if threatProfile.PredictedDamage == nil or hitValue > threatProfile.PredictedDamage then ThreatProfilePerWarningAbilitySynId[lastWarningSign.AbilitySynId].PredictedDamage = hitValue end
-						if threatProfile.CanBeBlocked==nil and Blocking() and BlockInProgress() then
-							ThreatProfilePerWarningAbilitySynId[lastWarningSign.AbilitySynId].CanBeBlocked = false
-							d("LEARNED NOT TO BLOCK "..lastWarningSign.AbilitySynId)
-						end
-					end
-				end
+			CleanUpBeginWarningSigns()
+			if result==ACTION_RESULT_STAGGERED then
+				LastBeginWarningSignPerSourceSynId[sourceSynId].GotStaggered = true
+			elseif result==ACTION_RESULT_BLOCKED_DAMAGE then
+				LastBeginWarningSignPerSourceSynId[sourceSynId].BlockedAnything = true
+				LastBeginWarningSignPerSourceSynId[sourceSynId].BlockedTimestamp = now
 			end
-		end
-	end
-end
-local function ReciteThreats()
-	d("---------------")
-	for key, value in pairs(ThreatPerSourceSynId) do
-		d("-------")
-		d(key)
-		d(value)
-		d(value.ThreatProfile)
-		if value.ETR > Now() then
-			ThreatPerSourceSynId[key] = nil
 		end
 	end
 end
