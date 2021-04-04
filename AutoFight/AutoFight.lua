@@ -13,8 +13,13 @@ local VMRight = LibPixelControl.VM_BTN_RIGHT
 
 local Blocking = IsBlockActive
 local Now = GetGameTimeMilliseconds
+local RoundUp = math.ceil
+local RoundDown = math.floor
 
 -- end local copies
+
+local SvWarningTypes = { }
+local WarningInstances = { }
 
 local function Health()
 	local MyHealth, MyMaxHealth = GetUnitPower('player', POWERTYPE_HEALTH)
@@ -231,7 +236,7 @@ local function DoNothing()
 	EndHeavyAttack()
 	EndBlock()
 end
-local LastBeginWarningSignPerSourceSynId = { } --each "WarningSign" is a table that consists of two keys: "AbilitySynId" and "Timestamp"
+local WarningInstances = WarningInstances or { }
 local ThreatProfilePerWarningAbilitySynId = { } --each "ThreatProfile" is a table that consists of these keys: "CanBeBlocked","PredictedDamage","CausesStagger","TriedBlocking","MinDmgLag","MaxDmgLag"
 local ThreatProfilePerWarningId = { }
 local LAG_THAT_IS_TOO_QUICK_TO_BLOCK = 120
@@ -245,13 +250,13 @@ local function ShouldBlock()
 	local StagETA
 	local StagETR
 	if StaminaPoints()<BlockCost then return false end
-	for key, value in pairs(LastBeginWarningSignPerSourceSynId) do
+	for key, value in pairs(WarningInstances) do
 		threat = ThreatProfilePerWarningAbilitySynId[value.AbilitySynId] or { }
 		DmgETA = (threat.MinDmgLag or 0) + value.Timestamp - 300
 		DmgETR = (threat.MaxDmgLag or ASSUMED_MAX_LAG_OF_WARNING) + value.Timestamp + 300
 		StagETA = (threat.MinStagLag or 0) + value.Timestamp - 300
 		StagETR = (threat.MaxStagLag or ASSUMED_MAX_LAG_OF_WARNING) + value.Timestamp + 300
-		if now > DmgETR and now > StagETR then LastBeginWarningSignPerSourceSynId[key] = nil
+		if now > DmgETR and now > StagETR then WarningInstances[key] = nil
 		else
 			if threat.CanBeBlocked ~= false then
 				if threat.CausesStagger then
@@ -280,45 +285,45 @@ local function ShouldBlock()
 	-- taminaPoints()>BlockCost and (IncomingAttackIsNotBlockTested or (IncomingAttackPredictedDamage/HealthPoints())>(BlockCost/StaminaPoints())) then Block()
 	-- return (IncomingAttackETA-300<Now() and IncomingAttackETR+300>Now())
 end
-local function LearnFromWarningSign(sourceSynId)
-	local warning = LastBeginWarningSignPerSourceSynId[sourceSynId] or nil
-	local threatProfile = ThreatProfilePerWarningId[]
-	if warning.BlockedAnything then
-		
+local function CleanUpWarningInstances()
+	local now = Now()
+	for key, value in pairs(WarningInstances.CeBegin) do
+		if now > key+5000 then WarningInstances.CeBegin[key] = nil end
 	end
 end
-local function CleanUpBeginWarningSigns()
-	for key, value in pairs(t) do
-		
-	end
+local function Lag2Wid(lag)
+	return (RoundDown(lag/100)),(RoundUp(lag/100))
 end
+local function Wid2Lag(wid)
+	return wid*100
+end
+
 local function OnEventCombatEvent( eventCode, result, isError, abilityName, abilityGraphic, abilityActionSlotType, sourceName, sourceType, targetName, targetType, hitValue, powerType, damageType, log, sourceUnitId, targetUnitId, abilityId )
 	if targetType==COMBAT_UNIT_TYPE_PLAYER and sourceType~=COMBAT_UNIT_TYPE_PLAYER then
-		
+
 		--enrich data
 		local now = Now()
 		local abilitySynId = sourceName.." "..abilityName
 		local sourceSynId = sourceName.." "..sourceUnitId
 		
 		if result==ACTION_RESULT_BEGIN then
+			local warningTypeId = "CeBegin "..abilityId
 			--record warning information for later use
-			LastBeginWarningSignPerSourceSynId[sourceSynId] = LastBeginWarningSignPerSourceSynId[sourceSynId] or { }
-			if (LastBeginWarningSignPerSourceSynId[sourceSynId].AbilitySynId or "DummyVal") ~= abilitySynId then
-				LearnFromWarningSign(sourceSynId)
-				LastBeginWarningSignPerSourceSynId[sourceSynId].AbilitySynId = abilitySynId
-				LastBeginWarningSignPerSourceSynId[sourceSynId].AbilityId = abilityId
-				LastBeginWarningSignPerSourceSynId[sourceSynId].Timestamp = now
-				LastBeginWarningSignPerSourceSynId[sourceSynId].BlockedAnything = false
-				LastBeginWarningSignPerSourceSynId[sourceSynId].BlockedTimestamp = nil
-				LastBeginWarningSignPerSourceSynId[sourceSynId].GotStaggered = false
-			end
-		elseif result==ACTION_RESULT_DAMAGE or result==ACTION_RESULT_BLOCKED_DAMAGE or result==ACTION_RESULT_STAGGERED then
-			CleanUpBeginWarningSigns()
-			if result==ACTION_RESULT_STAGGERED then
-				LastBeginWarningSignPerSourceSynId[sourceSynId].GotStaggered = true
-			elseif result==ACTION_RESULT_BLOCKED_DAMAGE then
-				LastBeginWarningSignPerSourceSynId[sourceSynId].BlockedAnything = true
-				LastBeginWarningSignPerSourceSynId[sourceSynId].BlockedTimestamp = now
+			WarningInstances.CeBegin[sourceSynId] = WarningInstances.CeBegin[sourceSynId] or { }
+			WarningInstances.CeBegin[sourceSynId][now] = abilityId
+			SvWarningTypes[warningTypeId].TotInsts = (SvWarningTypes[warningTypeId].TotInsts or 0) + 1
+		elseif result==ACTION_RESULT_DAMAGE then
+			for warningTimestamp, warningAbilityId in pairs(WarningInstances.CeBegin[sourceSynId]) do
+				local lag = now-warningTimestamp
+				local wid1, wid2 = Lag2Wid(lag)
+				local warningTypeId = "CeBegin "..warningAbilityId
+				SvWarningTypes[warningTypeId] = SvWarningTypes[warningTypeId] or { }
+				SvWarningTypes[warningTypeId][wid1] = SvWarningTypes[warningTypeId][wid1] or { }
+				SvWarningTypes[warningTypeId][wid2] = SvWarningTypes[warningTypeId][wid2] or { }
+				SvWarningTypes[warningTypeId][wid1].DmgInsts = (SvWarningTypes[warningTypeId][wid1].DmgInsts or 0) + 1
+				SvWarningTypes[warningTypeId][wid2].DmgInsts = (SvWarningTypes[warningTypeId][wid2].DmgInsts or 0) + 1
+				SvWarningTypes[warningTypeId][wid1].DmgAccum = (SvWarningTypes[warningTypeId][wid1].DmgAccum or 0) + hitValue
+				SvWarningTypes[warningTypeId][wid2].DmgAccum = (SvWarningTypes[warningTypeId][wid2].DmgAccum or 0) + hitValue
 			end
 		end
 	end
@@ -359,7 +364,7 @@ local function AutoFightMain()
 	elseif LowestGroupHealthPercent()<40 then UseAbility(1)
 	elseif LowestGroupHealthPercent()<70 and Magicka()>70 then UseAbility(1)
 	elseif LowestGroupHealthPercentWithoutRegen()<80 then UseAbility(2)
-	elseif ShouldBlock() then Block()
+	-- elseif ShouldBlock() then Block()
 	-- elseif LowestGroupHealthPercentWithoutRegen()<90 then WeaveAbility(2)
 	-- elseif not IHave("Minor Sorcery") and TargetIsHostileNpc() and Magicka()>80 then WeaveAbility(5)
 	-- elseif UltimateReady() and TargetIsBoss() then UseUltimate()
@@ -378,13 +383,21 @@ end
 -- START COMMON CODE 02
 
 local ADDON_NAME = "AutoFight-"..CharacterFirstName
+local function RegisterStuff()
+	EVENT_MANAGER:RegisterForUpdate(ADDON_NAME, 100, AutoFightMain)
+	-- EVENT_MANAGER:RegisterForUpdate(ADDON_NAME.."blarg", 1000, ReciteThreats)
+	EVENT_MANAGER:RegisterForEvent(ADDON_NAME, EVENT_COMBAT_EVENT, OnEventCombatEvent)
+	EVENT_MANAGER:AddFilterForEvent(ADDON_NAME, EVENT_COMBAT_EVENT, REGISTER_FILTER_TARGET_COMBAT_UNIT_TYPE, COMBAT_UNIT_TYPE_PLAYER)
+end
 local function OnAddonLoaded(event, name)
 	if name == ADDON_NAME then
 		EVENT_MANAGER:UnregisterForEvent(ADDON_NAME, event)
 		if string.find(GetUnitName("player"),CharacterFirstName) then
-			EVENT_MANAGER:RegisterForUpdate(ADDON_NAME, 100, AutoFightMain)
-			-- EVENT_MANAGER:RegisterForUpdate(ADDON_NAME.."blarg", 1000, ReciteThreats)
-			EVENT_MANAGER:RegisterForEvent(ADDON_NAME, EVENT_COMBAT_EVENT, OnEventCombatEvent)
+			SvWarningTypes = ZO_SavedVars:NewCharacterIdSettings("AutoFightWarningTypes",1)
+			WarningInstances = WarningInstances or { }
+			WarningInstances.CeBegin = WarningInstances.CeBegin or { }
+			SvWarningTypes = SvWarningTypes or { }
+			zo_callLater(RegisterStuff,60000)
 		end
 	end
 end

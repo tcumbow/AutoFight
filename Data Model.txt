@@ -1,0 +1,86 @@
+Data Model.txt
+Blocking scenarios
+
+BeginX, delay, StaggerY
+BeginX, delay, Damage X, BeginX, delay, StaggerY
+BeginX, delay, DamageY
+
+WarningInstance
+WarningProfileId (or just rehydrate if we add)
+WarningType = “ActionResultBegin”
+Timestamp
+AbilityId
+AbilitySynId
+SourceSynId
+AnyBlocksDuring
+AnyStaggersDuring
+
+WarningProfileId = “ActionResultBegin”+abilityId
+
+CausationHorizon assumption = 5 secs
+
+For each combat event of type BEGIN
+If WarningInstance exists within horizon for this SourceSynId and AbilitySynID matches, then ignore
+Else, create/replaceExisting WarningInstance and increment WarningProfile occurrence counter
+Before replacing, call Learn function on it
+
+CombatEvent is Stun if:
+ACTION_RESULT_STAGGERED
+
+Learnfunction on WarningInstance
+
+For each PotentialStun while valid Warning from same SourceSynId
+Increment WarningProfile’s StunPotential counter
+Add WarningLag to WarningProfile’s LagAvgAccumulator
+Increment WarningProfile’s LagAvgCounter
+
+For each WarningInstance
+Track occurrence of the following events within horizon
+First Staggered and/or incoming abilityName contains “stagger” (and timestamp)
+Whether we blocked at all
+Whether we roll-dodged at all
+
+At end of causationHorizon, learn…
+ThreatProfilePerWarningId:
+Occurrences + 1
+OccurrencesWithoutBlocking + 1
+OccurrencesWithBlock + 1
+StaggersWithoutBlock Per LagWindowId
+DamageBlockedOccurences
+
+
+
+------------------Old Stuff Above This Line---------------
+
+-------------
+LagWindowId - Integer 1-based
+(virtual 0) = -100 - 100
+1 = 0-200
+2 = 100-300
+3 = 200-400
+4 = 300-500
+etc....
+
+Lag2Wid = x -> floor(x/100),Ceiling(x/100)
+
+Wid2Lag = x -> x*100
+
+-------------		
+
+WarningTypeId = "CeBegin <abilityId>"
+
+-WarningType- key=WarningTypeId
+TotInsts: Integer - total number of instances observed
+# TotInstsBlocked: Integer - total number of instances where block events occurred (mostly used to calculate TotUnblockedInsts)
+# TotInstsRolled: Integer - '' roll dodges occurred ''
+DmgInsts: Wid Array: Integer - count of number of instances of unmitigated damage events
+DmgAccum: Wid Array: Integer - total cumulative HP damage of damage events
+BlockInsts: Wid Array: Integer - count of instances of blocked damage (and possibly plain blocked)
+StaggerInsts: Wid Array: Integer - count of instances of stagger
+
+-------------
+WarningInstances = Table w/one entry key="CeBegin"
+value = Table key=SourceSynId
+value = Table[Timestamp]:AbilityId
+
+

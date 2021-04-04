@@ -11,5 +11,6 @@
 ## Author: Tom Cumbow
 ## Description: AutoFight-Gideon
 ## DependsOn: LibPixelControl
+## SavedVariables: AutoFightWarningTypes
 
 AutoFight.lua
