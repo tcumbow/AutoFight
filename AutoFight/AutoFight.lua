@@ -236,54 +236,40 @@ local function DoNothing()
 	EndHeavyAttack()
 	EndBlock()
 end
+local function Lag2Wid(lag)
+	return (RoundDown(lag/100)),(RoundUp(lag/100))
+end
+local function Wid2Lag(wid)
+	return wid*100
+end
 local WarningInstances = WarningInstances or { }
-local ThreatProfilePerWarningAbilitySynId = { } --each "ThreatProfile" is a table that consists of these keys: "CanBeBlocked","PredictedDamage","CausesStagger","TriedBlocking","MinDmgLag","MaxDmgLag"
-local ThreatProfilePerWarningId = { }
 local LAG_THAT_IS_TOO_QUICK_TO_BLOCK = 120
 local ASSUMED_MAX_LAG_OF_WARNING = 5000
 local BlockCost = 2160
 local function ShouldBlock()
 	local now = Now()
-	local threat
-	local DmgETA
-	local DmgETR
-	local StagETA
-	local StagETR
 	if StaminaPoints()<BlockCost then return false end
-	for key, value in pairs(WarningInstances) do
-		threat = ThreatProfilePerWarningAbilitySynId[value.AbilitySynId] or { }
-		DmgETA = (threat.MinDmgLag or 0) + value.Timestamp - 300
-		DmgETR = (threat.MaxDmgLag or ASSUMED_MAX_LAG_OF_WARNING) + value.Timestamp + 300
-		StagETA = (threat.MinStagLag or 0) + value.Timestamp - 300
-		StagETR = (threat.MaxStagLag or ASSUMED_MAX_LAG_OF_WARNING) + value.Timestamp + 300
-		if now > DmgETR and now > StagETR then WarningInstances[key] = nil
-		else
-			if threat.CanBeBlocked ~= false then
-				if threat.CausesStagger then
-					if (threat.MinStagLag or 1000) > LAG_THAT_IS_TOO_QUICK_TO_BLOCK then
-						if now > StagETA and now < StagETR then
-							d("PREVENTING STAGGER "..value.AbilitySynId)
-							return true
-						end
-					else d("TOO QUICK TO PREVENT STAGGER "..value.AbilitySynId)
-					end
-				elseif (threat.MinDmgLag or 1000) > LAG_THAT_IS_TOO_QUICK_TO_BLOCK then
-					if now > DmgETA and now < DmgETR then
-						if ((threat.PredictedDamage or 10000)/HealthPoints())>(BlockCost/StaminaPoints()) then
-							return true
-						else d("Not Worth The Stamina: "..value.AbilitySynId)
-						end
-					end
-				-- else d("TOO QUICK "..value.AbilitySynId)
+	for iterSourceSynId, iterTableOfTimestamps in pairs(WarningInstances.CeBegin) do
+		for iterTimestamp, iterAbilityId in pairs(iterTableOfTimestamps) do
+			local widToLookAt = Lag2Wid(now - iterTimestamp + 100)
+			local warningTypeId = "CeBegin "..iterAbilityId
+			local warningTypeData = SvWarningTypes[warningTypeId][widToLookAt] or { }
+			if warningTypeData.DmgInsts ~= nil and warningTypeData.DmgAccum ~= nil then
+				local predictedDamage = warningTypeData.DmgAccum / warningTypeData.DmgInsts
+				local damageChance = warningTypeData.DmgInsts / SvWarningTypes[warningTypeId].TotInsts
+		
+				if damageChance > 1 then damageChance = 1 end
+		
+				local netPredictedDamage = predictedDamage * damageChance
+				d(netPredictedDamage)
+				if (netPredictedDamage/HealthPoints())>(BlockCost/StaminaPoints()) then
+					return true
+				else
+					return false
 				end
-			else d("CANNOT BLOCK "..value.AbilitySynId)
 			end
 		end
 	end
-	return false
-
-	-- taminaPoints()>BlockCost and (IncomingAttackIsNotBlockTested or (IncomingAttackPredictedDamage/HealthPoints())>(BlockCost/StaminaPoints())) then Block()
-	-- return (IncomingAttackETA-300<Now() and IncomingAttackETR+300>Now())
 end
 local function CleanUpWarningInstances()
 	local now = Now()
@@ -296,12 +282,6 @@ local function CleanUpWarningInstances()
 		end
 	end
 end
-local function Lag2Wid(lag)
-	return (RoundDown(lag/100)),(RoundUp(lag/100))
-end
-local function Wid2Lag(wid)
-	return wid*100
-end
 
 local function OnEventCombatEvent( eventCode, result, isError, abilityName, abilityGraphic, abilityActionSlotType, sourceName, sourceType, targetName, targetType, hitValue, powerType, damageType, log, sourceUnitId, targetUnitId, abilityId )
 	if targetType==COMBAT_UNIT_TYPE_PLAYER and sourceType~=COMBAT_UNIT_TYPE_PLAYER then
@@ -311,7 +291,7 @@ local function OnEventCombatEvent( eventCode, result, isError, abilityName, abil
 		local abilitySynId = sourceName.." "..abilityName
 		local sourceSynId = sourceName.." "..sourceUnitId
 		CleanUpWarningInstances()
-		
+
 		if result==ACTION_RESULT_BEGIN then
 			local warningTypeId = "CeBegin "..abilityId
 			--record warning information for later use
@@ -373,7 +353,7 @@ local function AutoFightMain()
 	elseif LowestGroupHealthPercent()<40 then UseAbility(1)
 	elseif LowestGroupHealthPercent()<70 and Magicka()>70 then UseAbility(1)
 	elseif LowestGroupHealthPercentWithoutRegen()<80 then UseAbility(2)
-	-- elseif ShouldBlock() then Block()
+	elseif ShouldBlock() then Block()
 	-- elseif LowestGroupHealthPercentWithoutRegen()<90 then WeaveAbility(2)
 	-- elseif not IHave("Minor Sorcery") and TargetIsHostileNpc() and Magicka()>80 then WeaveAbility(5)
 	-- elseif UltimateReady() and TargetIsBoss() then UseUltimate()
