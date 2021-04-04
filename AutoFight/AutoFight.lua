@@ -291,7 +291,7 @@ local function CleanUpWarningInstances()
 	for key, value in pairs(WarningInstances.CeBegin) do
 		if value ~= nil then
 			for key2, value2 in pairs(value) do
-				if key2~=nil and now > key2+5000 then WarningInstances.CeBegin[key][key2] = nil end
+				if key2~=nil and now > key2+ASSUMED_MAX_LAG_OF_WARNING then WarningInstances.CeBegin[key][key2] = nil end
 			end
 		end
 	end
