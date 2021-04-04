@@ -287,8 +287,13 @@ local function ShouldBlock()
 end
 local function CleanUpWarningInstances()
 	local now = Now()
+	if WarningInstances.CeBegin == nil then return end
 	for key, value in pairs(WarningInstances.CeBegin) do
-		if now > key+5000 then WarningInstances.CeBegin[key] = nil end
+		if value ~= nil then
+			for key2, value2 in pairs(value) do
+				if key2~=nil and now > key2+5000 then WarningInstances.CeBegin[key][key2] = nil end
+			end
+		end
 	end
 end
 local function Lag2Wid(lag)
@@ -305,25 +310,29 @@ local function OnEventCombatEvent( eventCode, result, isError, abilityName, abil
 		local now = Now()
 		local abilitySynId = sourceName.." "..abilityName
 		local sourceSynId = sourceName.." "..sourceUnitId
+		CleanUpWarningInstances()
 		
 		if result==ACTION_RESULT_BEGIN then
 			local warningTypeId = "CeBegin "..abilityId
 			--record warning information for later use
 			WarningInstances.CeBegin[sourceSynId] = WarningInstances.CeBegin[sourceSynId] or { }
 			WarningInstances.CeBegin[sourceSynId][now] = abilityId
+			SvWarningTypes[warningTypeId] = SvWarningTypes[warningTypeId] or { }
 			SvWarningTypes[warningTypeId].TotInsts = (SvWarningTypes[warningTypeId].TotInsts or 0) + 1
 		elseif result==ACTION_RESULT_DAMAGE then
-			for warningTimestamp, warningAbilityId in pairs(WarningInstances.CeBegin[sourceSynId]) do
-				local lag = now-warningTimestamp
-				local wid1, wid2 = Lag2Wid(lag)
-				local warningTypeId = "CeBegin "..warningAbilityId
-				SvWarningTypes[warningTypeId] = SvWarningTypes[warningTypeId] or { }
-				SvWarningTypes[warningTypeId][wid1] = SvWarningTypes[warningTypeId][wid1] or { }
-				SvWarningTypes[warningTypeId][wid2] = SvWarningTypes[warningTypeId][wid2] or { }
-				SvWarningTypes[warningTypeId][wid1].DmgInsts = (SvWarningTypes[warningTypeId][wid1].DmgInsts or 0) + 1
-				SvWarningTypes[warningTypeId][wid2].DmgInsts = (SvWarningTypes[warningTypeId][wid2].DmgInsts or 0) + 1
-				SvWarningTypes[warningTypeId][wid1].DmgAccum = (SvWarningTypes[warningTypeId][wid1].DmgAccum or 0) + hitValue
-				SvWarningTypes[warningTypeId][wid2].DmgAccum = (SvWarningTypes[warningTypeId][wid2].DmgAccum or 0) + hitValue
+			if WarningInstances.CeBegin[sourceSynId] ~= nil then
+				for warningTimestamp, warningAbilityId in pairs(WarningInstances.CeBegin[sourceSynId]) do
+					local lag = now-warningTimestamp
+					local wid1, wid2 = Lag2Wid(lag)
+					local warningTypeId = "CeBegin "..warningAbilityId
+					SvWarningTypes[warningTypeId] = SvWarningTypes[warningTypeId] or { }
+					SvWarningTypes[warningTypeId][wid1] = SvWarningTypes[warningTypeId][wid1] or { }
+					SvWarningTypes[warningTypeId][wid2] = SvWarningTypes[warningTypeId][wid2] or { }
+					SvWarningTypes[warningTypeId][wid1].DmgInsts = (SvWarningTypes[warningTypeId][wid1].DmgInsts or 0) + 1
+					SvWarningTypes[warningTypeId][wid2].DmgInsts = (SvWarningTypes[warningTypeId][wid2].DmgInsts or 0) + 1
+					SvWarningTypes[warningTypeId][wid1].DmgAccum = (SvWarningTypes[warningTypeId][wid1].DmgAccum or 0) + hitValue
+					SvWarningTypes[warningTypeId][wid2].DmgAccum = (SvWarningTypes[warningTypeId][wid2].DmgAccum or 0) + hitValue
+				end
 			end
 		end
 	end
@@ -384,6 +393,7 @@ end
 
 local ADDON_NAME = "AutoFight-"..CharacterFirstName
 local function RegisterStuff()
+	d("AutoFight started")
 	EVENT_MANAGER:RegisterForUpdate(ADDON_NAME, 100, AutoFightMain)
 	-- EVENT_MANAGER:RegisterForUpdate(ADDON_NAME.."blarg", 1000, ReciteThreats)
 	EVENT_MANAGER:RegisterForEvent(ADDON_NAME, EVENT_COMBAT_EVENT, OnEventCombatEvent)
@@ -393,11 +403,11 @@ local function OnAddonLoaded(event, name)
 	if name == ADDON_NAME then
 		EVENT_MANAGER:UnregisterForEvent(ADDON_NAME, event)
 		if string.find(GetUnitName("player"),CharacterFirstName) then
-			SvWarningTypes = ZO_SavedVars:NewCharacterIdSettings("AutoFightWarningTypes",1)
+			SvWarningTypes = ZO_SavedVars:NewCharacterIdSettings("AutoFightWarningTypes",3)
 			WarningInstances = WarningInstances or { }
 			WarningInstances.CeBegin = WarningInstances.CeBegin or { }
 			SvWarningTypes = SvWarningTypes or { }
-			zo_callLater(RegisterStuff,60000)
+			zo_callLater(RegisterStuff,20000)
 		end
 	end
 end
