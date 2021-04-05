@@ -257,10 +257,11 @@ local function ShouldBlock()
 				local warningTypeId = "CeBegin "..iterWarningInstanceDetails.AbilityId
 				local warningTypeData = SvWarningTypes[warningTypeId][widToLookAt] or { }
 				if warningTypeData.DmgInsts ~= nil and warningTypeData.DmgAccum ~= nil then
-					local damageChance = warningTypeData.DmgInsts / SvWarningTypes[warningTypeId].TotInsts
-					if damageChance>0.90 then
+					local numberOfInstancesWithBlock = SvWarningTypes[warningTypeId].TotInstsWhereBlockHappened or 0
+					local damageChance = warningTypeData.DmgInsts / (SvWarningTypes[warningTypeId].TotInsts-numberOfInstancesWithBlock)
+					if damageChance>0.5 then
 						local predictedDamage = warningTypeData.DmgAccum / warningTypeData.DmgInsts
-						d(predictedDamage)
+						d(damageChance)
 						return true
 					end
 				end
@@ -272,10 +273,14 @@ end
 local function CleanUpWarningInstances()
 	local now = Now()
 	if WarningInstances.CeBegin == nil then return end
-	for key, value in pairs(WarningInstances.CeBegin) do
-		if value ~= nil then
-			for key2, value2 in pairs(value) do
-				if value2.Timestamp~=nil and now > value2.Timestamp+ASSUMED_MAX_LAG_OF_WARNING then WarningInstances.CeBegin[key][value2.Timestamp] = nil end
+	for iterSourceSynId, iterWarningsFromSource in pairs(WarningInstances.CeBegin) do
+		if iterWarningsFromSource ~= nil then
+			for iterTimestamp, iterWarningDetails in pairs(iterWarningsFromSource) do
+				if iterWarningDetails.Timestamp~=nil and now > iterWarningDetails.Timestamp+ASSUMED_MAX_LAG_OF_WARNING then
+					local warningTypeId = "CeBegin "..iterWarningDetails.AbilityId
+					SvWarningTypes[warningTypeId].TotInstsWhereBlockHappened = (SvWarningTypes[warningTypeId].TotInstsWhereBlockHappened or 0) + 1
+					WarningInstances.CeBegin[iterSourceSynId][iterWarningDetails.Timestamp] = nil
+				end
 			end
 		end
 	end
@@ -292,6 +297,7 @@ local function OnEventCombatEvent( eventCode, result, isError, abilityName, abil
 
 		if result==ACTION_RESULT_BEGIN then
 			local warningTypeId = "CeBegin "..abilityId
+			d(abilityName)
 			--record warning information for later use
 			WarningInstances.CeBegin[sourceSynId] = WarningInstances.CeBegin[sourceSynId] or { }
 			WarningInstances.CeBegin[sourceSynId][now] = WarningInstances.CeBegin[sourceSynId][now] or { }
@@ -312,6 +318,12 @@ local function OnEventCombatEvent( eventCode, result, isError, abilityName, abil
 					SvWarningTypes[warningTypeId][wid2].DmgInsts = (SvWarningTypes[warningTypeId][wid2].DmgInsts or 0) + 1
 					SvWarningTypes[warningTypeId][wid1].DmgAccum = (SvWarningTypes[warningTypeId][wid1].DmgAccum or 0) + hitValue
 					SvWarningTypes[warningTypeId][wid2].DmgAccum = (SvWarningTypes[warningTypeId][wid2].DmgAccum or 0) + hitValue
+				end
+			end
+		elseif result==ACTION_RESULT_BLOCKED_DAMAGE then
+			if WarningInstances.CeBegin[sourceSynId] ~= nil then
+				for warningTimestamp, warningDetailTable in pairs(WarningInstances.CeBegin[sourceSynId]) do
+					WarningInstances.CeBegin[sourceSynId][warningTimestamp].BlockHappened = true
 				end
 			end
 		end
@@ -383,7 +395,7 @@ local function OnAddonLoaded(event, name)
 	if name == ADDON_NAME then
 		EVENT_MANAGER:UnregisterForEvent(ADDON_NAME, event)
 		if string.find(GetUnitName("player"),CharacterFirstName) then
-			SvWarningTypes = ZO_SavedVars:NewCharacterIdSettings("AutoFightWarningTypes",4)
+			SvWarningTypes = ZO_SavedVars:NewCharacterIdSettings("AutoFightWarningTypes",6)
 			WarningInstances = WarningInstances or { }
 			WarningInstances.CeBegin = WarningInstances.CeBegin or { }
 			SvWarningTypes = SvWarningTypes or { }

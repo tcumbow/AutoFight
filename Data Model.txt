@@ -81,7 +81,7 @@ StaggerInsts: Wid Array: Integer - count of instances of stagger
 -------------
 WarningInstances = Table w/one entry key="CeBegin"
 value = Table key=SourceSynId
-value = Table[Timestamp]:AbilityId
+value = Table[Timestamp]:AbilityId,BlockHappened
 
 -------------
 Want to block?
