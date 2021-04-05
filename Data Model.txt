@@ -83,4 +83,9 @@ WarningInstances = Table w/one entry key="CeBegin"
 value = Table key=SourceSynId
 value = Table[Timestamp]:AbilityId
 
+-------------
+Want to block?
+(Now-Timestamp)+100 = "lag"
+Lag > Wid
+check Wid for risk
 

@@ -250,26 +250,24 @@ local function ShouldBlock()
 	local now = Now()
 	if StaminaPoints()<BlockCost then return false end
 	for iterSourceSynId, iterTableOfTimestamps in pairs(WarningInstances.CeBegin) do
-		for iterTimestamp, iterAbilityId in pairs(iterTableOfTimestamps) do
-			local widToLookAt = Lag2Wid(now - iterTimestamp + 100)
-			local warningTypeId = "CeBegin "..iterAbilityId
-			local warningTypeData = SvWarningTypes[warningTypeId][widToLookAt] or { }
-			if warningTypeData.DmgInsts ~= nil and warningTypeData.DmgAccum ~= nil then
-				local predictedDamage = warningTypeData.DmgAccum / warningTypeData.DmgInsts
-				local damageChance = warningTypeData.DmgInsts / SvWarningTypes[warningTypeId].TotInsts
-		
-				if damageChance > 1 then damageChance = 1 end
-		
-				local netPredictedDamage = predictedDamage * damageChance
-				d(netPredictedDamage)
-				if (netPredictedDamage/HealthPoints())>(BlockCost/StaminaPoints()) then
-					return true
-				else
-					return false
+		for iterTimestamp, iterWarningInstanceDetails in pairs(iterTableOfTimestamps) do
+			local firstWidToLookAt = Lag2Wid(now - iterTimestamp + 300)
+			for i = 0, 3, 1 do
+				local widToLookAt = firstWidToLookAt + i
+				local warningTypeId = "CeBegin "..iterWarningInstanceDetails.AbilityId
+				local warningTypeData = SvWarningTypes[warningTypeId][widToLookAt] or { }
+				if warningTypeData.DmgInsts ~= nil and warningTypeData.DmgAccum ~= nil then
+					local damageChance = warningTypeData.DmgInsts / SvWarningTypes[warningTypeId].TotInsts
+					if damageChance>0.90 then
+						local predictedDamage = warningTypeData.DmgAccum / warningTypeData.DmgInsts
+						d(predictedDamage)
+						return true
+					end
 				end
 			end
 		end
 	end
+	return false
 end
 local function CleanUpWarningInstances()
 	local now = Now()
@@ -277,7 +275,7 @@ local function CleanUpWarningInstances()
 	for key, value in pairs(WarningInstances.CeBegin) do
 		if value ~= nil then
 			for key2, value2 in pairs(value) do
-				if key2~=nil and now > key2+ASSUMED_MAX_LAG_OF_WARNING then WarningInstances.CeBegin[key][key2] = nil end
+				if value2.Timestamp~=nil and now > value2.Timestamp+ASSUMED_MAX_LAG_OF_WARNING then WarningInstances.CeBegin[key][value2.Timestamp] = nil end
 			end
 		end
 	end
@@ -296,15 +294,17 @@ local function OnEventCombatEvent( eventCode, result, isError, abilityName, abil
 			local warningTypeId = "CeBegin "..abilityId
 			--record warning information for later use
 			WarningInstances.CeBegin[sourceSynId] = WarningInstances.CeBegin[sourceSynId] or { }
-			WarningInstances.CeBegin[sourceSynId][now] = abilityId
+			WarningInstances.CeBegin[sourceSynId][now] = WarningInstances.CeBegin[sourceSynId][now] or { }
+			WarningInstances.CeBegin[sourceSynId][now].AbilityId = abilityId
+			WarningInstances.CeBegin[sourceSynId][now].BlockHappened = false
 			SvWarningTypes[warningTypeId] = SvWarningTypes[warningTypeId] or { }
 			SvWarningTypes[warningTypeId].TotInsts = (SvWarningTypes[warningTypeId].TotInsts or 0) + 1
 		elseif result==ACTION_RESULT_DAMAGE then
 			if WarningInstances.CeBegin[sourceSynId] ~= nil then
-				for warningTimestamp, warningAbilityId in pairs(WarningInstances.CeBegin[sourceSynId]) do
+				for warningTimestamp, warningDetailTable in pairs(WarningInstances.CeBegin[sourceSynId]) do
 					local lag = now-warningTimestamp
 					local wid1, wid2 = Lag2Wid(lag)
-					local warningTypeId = "CeBegin "..warningAbilityId
+					local warningTypeId = "CeBegin "..warningDetailTable.AbilityId
 					SvWarningTypes[warningTypeId] = SvWarningTypes[warningTypeId] or { }
 					SvWarningTypes[warningTypeId][wid1] = SvWarningTypes[warningTypeId][wid1] or { }
 					SvWarningTypes[warningTypeId][wid2] = SvWarningTypes[warningTypeId][wid2] or { }
@@ -383,7 +383,7 @@ local function OnAddonLoaded(event, name)
 	if name == ADDON_NAME then
 		EVENT_MANAGER:UnregisterForEvent(ADDON_NAME, event)
 		if string.find(GetUnitName("player"),CharacterFirstName) then
-			SvWarningTypes = ZO_SavedVars:NewCharacterIdSettings("AutoFightWarningTypes",3)
+			SvWarningTypes = ZO_SavedVars:NewCharacterIdSettings("AutoFightWarningTypes",4)
 			WarningInstances = WarningInstances or { }
 			WarningInstances.CeBegin = WarningInstances.CeBegin or { }
 			SvWarningTypes = SvWarningTypes or { }
