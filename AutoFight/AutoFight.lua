@@ -16,6 +16,8 @@ local Now = GetGameTimeMilliseconds
 
 -- end local copies
 
+local BlockCost = 2160
+
 local function Health()
 	local MyHealth, MyMaxHealth = GetUnitPower('player', POWERTYPE_HEALTH)
 	return ((MyHealth/MyMaxHealth)*100)
@@ -305,7 +307,7 @@ end
 -- START CHARACTER-SPECIFIC CODE 01
 
 local CharacterFirstName = "Generic"
-local BlockCost = 2160
+BlockCost = 2160
 
 local function AutoFightMain()
 	if AutoFightShouldNotAct() then DoNothing()
