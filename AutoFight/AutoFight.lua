@@ -333,6 +333,7 @@ local function OnAddonLoaded(event, name)
 		if string.find(GetUnitName("player"),CharacterFirstName) then
 			EVENT_MANAGER:RegisterForUpdate(ADDON_NAME, 100, AutoFightMain)
 			EVENT_MANAGER:RegisterForEvent(ADDON_NAME, EVENT_COMBAT_EVENT, OnEventCombatEvent)
+			EVENT_MANAGER:AddFilterForEvent(ADDON_NAME, EVENT_COMBAT_EVENT, REGISTER_FILTER_TARGET_COMBAT_UNIT_TYPE, COMBAT_UNIT_TYPE_PLAYER)
 		end
 	end
 end
