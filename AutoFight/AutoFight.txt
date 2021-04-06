@@ -11,5 +11,6 @@
 ## Author: Tom Cumbow
 ## Description: AutoFight-Generic
 ## DependsOn: LibPixelControl
+## SavedVariables: ABB
 
 AutoFight.lua
