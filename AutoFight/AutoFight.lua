@@ -298,9 +298,15 @@ local function OnEventCombatEvent( eventCode, result, isError, abilityName, abil
 		end
 	end
 end
+local function ShouldBlock()
+	return (AttackIncoming() and StaminaPoints()>BlockCost and (IncomingAttackIsNotBlockTested or (IncomingAttackPredictedDamage/HealthPoints())>(BlockCost/StaminaPoints())))
+end
 
---Suggested Logic Examples (for function AutoFightMain below)
---[Smart Blocking]: elseif AttackIncoming() and StaminaPoints()>BlockCost and (IncomingAttackIsNotBlockTested or (IncomingAttackPredictedDamage/HealthPoints())>(BlockCost/StaminaPoints())) then Block()
+--[[
+Suggested Logic Examples (for function AutoFightMain below)
+	Ultimate: elseif UltimateReady() and TargetIsHostileNpc() then UseUltimate()
+	Smart Blocking: elseif ShouldBlock() then Block()
+]]--
 
 -- END COMMON CODE 01
 
