@@ -1,2 +1,2 @@
-robocopy .\AutoFight A:\AutoFight /mir
-robocopy .\AutoFight J:\AutoFight /mir
+robocopy .\AutoFight A:\AutoFight-Nissa /mir
+robocopy .\AutoFight J:\AutoFight-Nissa /mir
