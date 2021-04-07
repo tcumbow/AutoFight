@@ -323,7 +323,7 @@ Suggested Logic Examples (for function AutoFightMain below)
 
 -- START CHARACTER-SPECIFIC CODE 01
 
-local CharacterFirstName = "Generic"
+local CharacterFirstName = "Nissa"
 BlockCost = 2160
 
 local function AutoFightMain()

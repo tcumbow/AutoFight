@@ -96,7 +96,7 @@
     "emeraldwalk.runonsave": {
         "commands": [
             {
-                "cmd": "copyrobo .\\AutoFight A:\\AutoFight-Generic /mir"
+                "cmd": "RunOnSave.bat"
             }
         ]
     }
