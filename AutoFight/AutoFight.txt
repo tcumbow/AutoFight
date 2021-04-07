@@ -14,3 +14,4 @@
 ## SavedVariables: ABB
 
 AutoFight.lua
+Bindings.xml

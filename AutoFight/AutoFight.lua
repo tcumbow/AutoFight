@@ -17,6 +17,7 @@ local Now = GetGameTimeMilliseconds
 -- end local copies
 
 local BlockCost = 2160
+local InMeleeRange = false
 
 local function Health()
 	local MyHealth, MyMaxHealth = GetUnitPower('player', POWERTYPE_HEALTH)
@@ -301,6 +302,16 @@ end
 local function ShouldBlock()
 	return (AttackIncoming() and StaminaPoints()>BlockCost and (IncomingAttackIsNotBlockTested or (IncomingAttackPredictedDamage/HealthPoints())>(BlockCost/StaminaPoints())))
 end
+
+-- begin Key Bindings
+ZO_CreateStringId("SI_BINDING_NAME_InMeleeRange", "InMeleeRange")
+function KeyBindInMeleeRangeYes()
+	InMeleeRange = true
+end
+function KeyBindInMeleeRangeNo()
+	InMeleeRange = false
+end
+-- end Key Bindings
 
 --[[
 Suggested Logic Examples (for function AutoFightMain below)

@@ -1,0 +1,10 @@
+<Bindings>
+  <Layer name="General">
+    <Category name="AutoFight">
+      <Action name="InMeleeRange">
+        <Down>KeyBindInMeleeRangeYes()</Down>
+        <Up>KeyBindInMeleeRangeNo()</Up>
+      </Action>
+    </Category>
+  </Layer>
+</Bindings>
