@@ -1,7 +1,7 @@
 <Bindings>
   <Layer name="General">
     <Category name="AutoFight">
-      <Action name="InMeleeRange">
+      <Action name="InMeleeRange-Generic">
         <Down>KeyBindInMeleeRangeYes()</Down>
         <Up>KeyBindInMeleeRangeNo()</Up>
       </Action>
