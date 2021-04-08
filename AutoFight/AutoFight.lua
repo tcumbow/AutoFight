@@ -304,7 +304,7 @@ local function ShouldBlock()
 end
 
 -- begin Key Bindings
-ZO_CreateStringId("SI_BINDING_NAME_InMeleeRange", "InMeleeRange")
+ZO_CreateStringId("SI_BINDING_NAME_InMeleeRange-Nissa", "InMeleeRange-Nissa")
 function KeyBindInMeleeRangeYes()
 	InMeleeRange = true
 end
