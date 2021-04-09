@@ -328,8 +328,10 @@ BlockCost = 2160
 
 local function AutoFightMain()
 	if AutoFightShouldNotAct() then DoNothing()
-	-- elseif UltimateReady() and TargetIsHostileNpc() then UseUltimate()
-	elseif Stamina()<40 then HeavyAttack()
+	elseif ShouldBlock() then Block()
+	elseif UltimateReady() and TargetIsMoreThanTrash() and TargetIsHostileNpc() then UseUltimate()
+	elseif Health()<60 and not IHave("Resolving Vigor") and StaminaPoints()>3000 then WeaveAbility(4)
+	elseif Stamina()<60 then HeavyAttack()
 	elseif TargetIsHostileNpc() and not TargetHas("Poison Injection") then WeaveAbility(2)
 	elseif TargetIsHostileNpc() and not TargetHas("Acid Spray") then WeaveAbility(3)
 	elseif TargetIsHostileNpc() then WeaveAbility(1)
