@@ -349,8 +349,6 @@ local function OnAddonLoaded(event, name)
 			EVENT_MANAGER:RegisterForUpdate(ADDON_NAME, 100, AutoFightMain)
 			EVENT_MANAGER:RegisterForEvent(ADDON_NAME, EVENT_COMBAT_EVENT, OnEventCombatEvent)
 			EVENT_MANAGER:AddFilterForEvent(ADDON_NAME, EVENT_COMBAT_EVENT, REGISTER_FILTER_TARGET_COMBAT_UNIT_TYPE, COMBAT_UNIT_TYPE_PLAYER)
-			EVENT_MANAGER:RegisterForEvent(ADDON_NAME.."CI", EVENT_COMBAT_EVENT, OnEventArrowBarrageCombatEvent)
-			EVENT_MANAGER:AddFilterForEvent(ADDON_NAME.."CI", EVENT_COMBAT_EVENT, REGISTER_FILTER_ABILITY_ID, 343)
 			ABB = ZO_SavedVars:NewCharacterIdSettings("ABB",0)
 			InitializeABBDataStructures()
 		end
