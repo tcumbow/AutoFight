@@ -328,6 +328,7 @@ BlockCost = 2160
 
 local function AutoFightMain()
 	if AutoFightShouldNotAct() then DoNothing()
+	elseif ShouldBlock() then Block()
 	elseif Health() < 60 then WeaveAbility(4)
 	elseif UltimateReady() and TargetIsHostileNpc() and TargetIsMoreThanTrash() then UseUltimate()
 	elseif TargetIsHostileNpc() and not TargetHas("Minor Vulnerability") and Magicka() > 25 then WeaveAbility(3)
