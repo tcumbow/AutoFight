@@ -83,7 +83,12 @@
         "LibPixelControl",
         "IsBlockActive",
         "GetUnitName",
-        "String"
+        "String",
+        "COMBAT_UNIT_TYPE_PLAYER",
+        "ACTION_RESULT_BEGIN",
+        "ACTION_RESULT_DAMAGE",
+        "ACTION_RESULT_BLOCKED_DAMAGE",
+        "REGISTER_FILTER_TARGET_COMBAT_UNIT_TYPE"
     ],
     "cSpell.words": [
         "Sorc"

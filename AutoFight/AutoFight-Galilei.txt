@@ -11,5 +11,7 @@
 ## Author: Tom Cumbow
 ## Description: AutoFight-Galilei
 ## DependsOn: LibPixelControl
+## SavedVariables: ABB
 
 AutoFight.lua
+Bindings.xml
