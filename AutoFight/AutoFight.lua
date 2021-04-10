@@ -150,7 +150,7 @@ end
 local ETA = 0
 local function AutoFightMain()
 	if not IsUnitInCombat('player') then return end
-	if IsReticleHidden() or IsUnitSwimming('player') or BestialTransformationActive() then return end
+	if IsReticleHidden() or IsUnitSwimming('player') or IsMounted() or BestialTransformationActive() then return end
 	if ETA > GetGameTimeMilliseconds() then return end
 
 UpdateLowestGroupHealth()
