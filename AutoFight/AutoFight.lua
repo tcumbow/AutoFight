@@ -361,7 +361,7 @@ local function TopPriorityAutoFight()
 	TargetName = GetUnitName("reticleover")
 	if AutoFightShouldNotAct() then DoNothing()
 	elseif SynergyName == "Flesh Grenade" and TargetName == "Inmate" then DoSynergy()
-	else return nil --signals to the caller that this function did NOT take an action; the caller function will continue down its elseif sequence
+	else return false --signals to the caller that this function did NOT take an action; the caller function will continue down its elseif sequence
 	end
 	return true --signals to caller that this function did take an action and the caller function should not override that
 end
@@ -369,7 +369,7 @@ end
 local function PreAttackAutoFight()
 	if TargetName == "Inmate" or SynergyName == "Flesh Grenade" then DoNothing()
 	elseif TargetName=="Lightning Aspect" then DoNothing()
-	else return nil --signals to the caller that this function did NOT take an action; the caller function will continue down its elseif sequence
+	else return false --signals to the caller that this function did NOT take an action; the caller function will continue down its elseif sequence
 	end
 	return true --signals to caller that this function did take an action and the caller function should not override that
 end
