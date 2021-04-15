@@ -1,5 +1,9 @@
 -- START COMMON CODE 01
 
+local ADDON_NAME = "AutoFight"
+local GIDEON = "Gideon Godiva"
+local GALILEI = "Galilei Godiva"
+
 -- start local copies
 
 local VK1 = LibPixelControl.VK_1
@@ -17,10 +21,15 @@ local Now = GetGameTimeMilliseconds
 local Mounted = IsMounted
 local Print = d
 
+local GetUnitName = GetUnitName
+
 -- end local copies
 
-local BlockCost = 2160
+local CharName
+local BlockCost = 2160 -- default until overwritten by character-specific code
 local InMeleeRange = false
+local SynergyName
+local TargetName
 
 local function Health()
 	local MyHealth, MyMaxHealth = GetUnitPower('player', POWERTYPE_HEALTH)
@@ -129,9 +138,6 @@ end
 local function TargetShouldBeTaunted()
 	return (TargetCouldBeTaunted() and (TargetIsBoss() or (Stamina()>50 and TargetIsMoreThanTrash())))
 end
-local function TargetName()
-	return (GetUnitName('reticleover'))
-end
 local function InteractVerb()
 	local action, _, _, _, _ = GetGameCameraInteractableActionInfo()
 	return action
@@ -141,7 +147,7 @@ local function InteractName()
 	return interactableName
 end
 local function AutoFightShouldNotAct()
-	return (not IsUnitInCombat('player') or IsReticleHidden() or IsUnitSwimming('player') or Mounted() or IHave("Bestial Transformation") or IHave("Skeevaton") or TargetName()=="Plane Meld Rift" or TargetName()=="Lightning Aspect" or InteractName()=="Cage of Torment" or InteractName()=="Daedric Alter")
+	return (not IsUnitInCombat('player') or IsReticleHidden() or IsUnitSwimming('player') or Mounted() or IHave("Bestial Transformation") or IHave("Skeevaton") or TargetName=="Plane Meld Rift" or InteractName()=="Cage of Torment" or InteractName()=="Daedric Alter")
 end
 local function LowestGroupHealthPercent()
 	local GroupSize = GetGroupSize()
@@ -315,7 +321,7 @@ local function SynergyName()
 end
 
 -- begin Key Bindings
-ZO_CreateStringId("SI_BINDING_NAME_InMeleeRange-Generic", "InMeleeRange-Generic")
+ZO_CreateStringId("SI_BINDING_NAME_InMeleeRange", "InMeleeRange")
 function KeyBindInMeleeRangeYes()
 	InMeleeRange = true
 end
@@ -324,21 +330,44 @@ function KeyBindInMeleeRangeNo()
 end
 -- end Key Bindings
 
---[[
-Suggested Logic Examples (for function AutoFightMain below)
-	Ultimate: elseif UltimateReady() and TargetIsHostileNpc() then UseUltimate()
-	Smart Blocking: elseif ShouldBlock() then Block()
-]]--
+-- begin AutoFight standard inserts
+-- these are bits of logic that are common across all characters and need to be inserted at specific points (for example: after healing, but before attacking)
+
+local function TopPriorityAutoFight()
+	SynergyName = SynergyName()
+	TargetName = GetUnitName("reticleover")
+	if AutoFightShouldNotAct() then DoNothing()
+	elseif SynergyName == "Flesh Grenade" and TargetName == "Inmate" then DoSynergy()
+	else return nil --signals to the caller that this function did NOT take an action; the caller function will continue down its elseif sequence
+	end
+	return true --signals to caller that this function did take an action and the caller function should not override that
+end
+
+local function PreAttackAutoFight()
+	if TargetName == "Inmate" or SynergyName == "Flesh Grenade" then DoNothing()
+	elseif TargetName=="Lightning Aspect" then DoNothing()
+	else return nil --signals to the caller that this function did NOT take an action; the caller function will continue down its elseif sequence
+	end
+	return true --signals to caller that this function did take an action and the caller function should not override that
+end
+
+-- end AutoFight standard inserts
 
 -- END COMMON CODE 01
 
 -- START CHARACTER-SPECIFIC CODE 01
 
-local CharacterFirstName = "Generic"
-BlockCost = 2160
+local BlockCostPerChar = {
+	[GIDEON] = nil,
+}
 
-local function AutoFightMain()
-	if AutoFightShouldNotAct() then DoNothing()
+local AutoFight = {}
+
+AutoFight[GIDEON] = function ()
+	if TopPriorityAutoFight() then
+	elseif Health() < 80 then UseAbility(1)
+	elseif PreAttackAutoFight() then
+	elseif ShouldBlock() then Block()
 	elseif UltimateReady() and TargetIsHostileNpc() then UseUltimate()
 	else DoNothing()
 	end
@@ -348,27 +377,21 @@ end
 
 -- START COMMON CODE 02
 
-local function Update100()
-	local synergyName = SynergyName()
-	local targetName = GetUnitName("reticleover")
-	if AutoFightShouldNotAct() then DoNothing()
-	elseif targetName == "Inmate" then
-		if synergyName == "Flesh Grenade" then DoSynergy()
-		else DoNothing() end
-	elseif synergyName == "Flesh Grenade" then DoNothing()
-	else AutoFightMain() end
+local function InitializeVariables()
+	BlockCost = BlockCostPerChar[CharName] or BlockCost
+	ABB = ZO_SavedVars:NewCharacterIdSettings("ABB",0)
+	InitializeABBDataStructures()
 end
 
-local ADDON_NAME = "AutoFight-"..CharacterFirstName
 local function OnAddonLoaded(event, name)
 	if name == ADDON_NAME then
 		EVENT_MANAGER:UnregisterForEvent(ADDON_NAME, event)
-		if string.find(GetUnitName("player"),CharacterFirstName) then
-			EVENT_MANAGER:RegisterForUpdate(ADDON_NAME, 100, Update100)
+		CharName = GetUnitName("player")
+		if AutoFight[CharName] ~= nil then -- don't bother registering for events if I haven't written an AutoFight function for the current character
+			InitializeVariables()
+			EVENT_MANAGER:RegisterForUpdate(ADDON_NAME, 100, AutoFight[CharName]) -- register the character-specific AutoFight function to be called every 100ms
 			EVENT_MANAGER:RegisterForEvent(ADDON_NAME, EVENT_COMBAT_EVENT, OnEventCombatEvent)
 			EVENT_MANAGER:AddFilterForEvent(ADDON_NAME, EVENT_COMBAT_EVENT, REGISTER_FILTER_TARGET_COMBAT_UNIT_TYPE, COMBAT_UNIT_TYPE_PLAYER)
-			ABB = ZO_SavedVars:NewCharacterIdSettings("ABB",0)
-			InitializeABBDataStructures()
 		end
 	end
 end
