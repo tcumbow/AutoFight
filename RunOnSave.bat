@@ -1,0 +1,1 @@
+robocopy .\AutoFight A:\AutoFight
