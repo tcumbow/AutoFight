@@ -338,11 +338,6 @@ local function ShouldBlock()
 end
 -- #endregion
 
-local function SynergyName()
-	local synergyName = GetSynergyInfo()
-	return synergyName
-end
-
 -- #region Key Bindings
 ZO_CreateStringId("SI_BINDING_NAME_InMeleeRange", "InMeleeRange")
 function KeyBindInMeleeRangeYes()
@@ -357,7 +352,7 @@ end
 -- these are bits of logic that are common across all characters and need to be inserted at specific points (for example: after healing, but before attacking)
 
 local function TopPriorityAutoFight()
-	SynergyName = SynergyName()
+	SynergyName = GetSynergyInfo()
 	TargetName = GetUnitName("reticleover")
 	if AutoFightShouldNotAct() then DoNothing()
 	elseif SynergyName == "Flesh Grenade" and TargetName == "Inmate" then DoSynergy()
