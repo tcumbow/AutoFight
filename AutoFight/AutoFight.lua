@@ -76,7 +76,7 @@ local function UnitHasBuffTimeLeft(unitTag,buff,milliSeconds)
 	return false
 end
 local function TargetIsHostileNpc()
-	return DoesUnitExist('reticleover') and not IsUnitDead('reticleover') and GetUnitType('reticleover') ~= 1 and GetUnitReaction('reticleover') == UNIT_REACTION_HOSTILE
+	return DoesUnitExist('reticleover') and not IsUnitDead('reticleover') and GetUnitType('reticleover') ~= 1 and GetUnitReaction('reticleover') == UNIT_REACTION_HOSTILE and IsUnitInCombat('reticleover')
 end
 local function TargetHas(buffName)
 	local numAuras = GetNumBuffs('reticleover')
