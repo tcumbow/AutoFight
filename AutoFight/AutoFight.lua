@@ -404,6 +404,7 @@ AutoFight["TEMPLATE"] = function ()
 	elseif PreAttackAutoFight() then
 	elseif ShouldBlock() then Block()
 	elseif UltimateReady() and TargetIsHostileNpc() then UseUltimate()
+	elseif TargetIsHostileNpc() and not Blocking() then HeavyAttack()
 	else DoNothing()
 	end
 end
