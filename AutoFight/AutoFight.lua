@@ -3,6 +3,7 @@
 local ADDON_NAME = "AutoFight"
 local GIDEON = "Gideon Godiva"
 local GALILEI = "Galilei Godiva"
+local DORIAN = "Dorian Delafield"
 
 -- #region start local copies
 
@@ -393,6 +394,19 @@ AutoFight[GIDEON] = function ()
 	elseif LowestGroupHealthPercentWithoutRegen()<90 then WeaveAbility(2)
 	elseif InMeleeRange and Magicka()>80 then WeaveAbility(5)
 	elseif SomeoneCouldUseRegen() and Magicka()>50 then WeaveAbility(2)
+	elseif TargetIsHostileNpc() and not Blocking() then HeavyAttack()
+	else DoNothing()
+	end
+end
+
+AutoFight[DORIAN] = function ()
+	if TopPriorityAutoFight() then
+	elseif Health() < 80 and Magicka() > 80 then WeaveAbility(4)
+	elseif Health() < 60 and Magicka() > 40 then UseAbility(4)
+	elseif Health() < 40 and Magicka() > 25 then UseAbility(4)
+	elseif PreAttackAutoFight() then
+	elseif ShouldBlock() then Block()
+	elseif UltimateReady() then UseUltimate()
 	elseif TargetIsHostileNpc() and not Blocking() then HeavyAttack()
 	else DoNothing()
 	end
