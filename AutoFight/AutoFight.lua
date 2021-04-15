@@ -338,8 +338,11 @@ local CharacterFirstName = "Dorian"
 BlockCost = 2160
 
 local function AutoFightMain()
-	if AutoFightShouldNotAct() then DoNothing()
-	elseif UltimateReady() and TargetIsHostileNpc() then UseUltimate()
+	if Health() < 80 and Magicka() > 80 then WeaveAbility(4)
+	elseif Health() < 60 and Magicka() > 40 then UseAbility(4)
+	elseif Health() < 40 and Magicka() > 25 then UseAbility(4)
+	elseif UltimateReady() then UseUltimate()
+	elseif TargetIsHostileNpc() then HeavyAttack()
 	else DoNothing()
 	end
 end
