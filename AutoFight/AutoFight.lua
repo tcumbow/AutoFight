@@ -389,7 +389,7 @@ AutoFight[GIDEON] = function ()
 	elseif LowestGroupHealthPercentWithoutRegen()<80 then UseAbility(2)
 	elseif ShouldBlock() then Block()
 	elseif PreAttackAutoFight() then
-	elseif UltimateReady() and TargetIsHostileNpc() then UseUltimate()
+	-- elseif UltimateReady() and TargetIsHostileNpc() then UseUltimate()
 	elseif LowestGroupHealthPercentWithoutRegen()<90 then WeaveAbility(2)
 	elseif InMeleeRange and Magicka()>80 then WeaveAbility(5)
 	elseif SomeoneCouldUseRegen() and Magicka()>50 then WeaveAbility(2)
