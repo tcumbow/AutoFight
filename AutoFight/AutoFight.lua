@@ -4,6 +4,16 @@ local ADDON_NAME = "AutoFight"
 local GIDEON = "Gideon Godiva"
 local GALILEI = "Galilei Godiva"
 local DORIAN = "Dorian Delafield"
+local GALILEI = "Galilei Godiva"
+local HADARA = "Hadara Hazelwood"
+local ELODIE = "Elodie Enwarin"
+local FREYA = "Freya Fiori"
+local NEVIRA = "Nevira Pendragon"
+local KRIN = "Krin Delvinay"
+local NISSA = "Nissa Forbus"
+local ANYA = "Anya Romaine"
+local MINA = "Mina Coperton"
+local KARRIE = "Karrie Lumin"
 
 -- #region start local copies
 
