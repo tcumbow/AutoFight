@@ -149,6 +149,7 @@ end
 local function AutoFightShouldNotAct()
 	return (not IsUnitInCombat('player') or IsReticleHidden() or IsUnitSwimming('player') or Mounted() or IHave("Bestial Transformation") or IHave("Skeevaton") or TargetName=="Plane Meld Rift" or InteractName()=="Cage of Torment" or InteractName()=="Daedric Alter")
 end
+-- #region Healer functions
 local function LowestGroupHealthPercent()
 	local GroupSize = GetGroupSize()
 	local LowestGroupHealthPercent = 1.00
@@ -189,6 +190,25 @@ local function LowestGroupHealthPercentWithoutRegen()
 	end
 	return (LowestGroupHealthPercent * 100)
 end
+local function SomeoneCouldUseRegen()
+	local GroupSize = GetGroupSize()
+	local unitTag
+	if GroupSize > 0 then
+		local GroupMembersWithPlentyOfRegen = 0
+		local GroupMembersInSupportRange = 0
+		for i = 1, GroupSize do
+			unitTag = GetGroupUnitTagByIndex(i)
+			if IsUnitInGroupSupportRange(unitTag) and not IsUnitDead(unitTag) and GetUnitType(unitTag) == 1 then
+				GroupMembersInSupportRange = GroupMembersInSupportRange + 1
+				if not UnitHasRegen(unitTag) then return true end
+				if UnitHasBuffTimeLeft(unitTag,"Radiating Regeneration",5000) then
+				GroupMembersWithPlentyOfRegen = GroupMembersWithPlentyOfRegen + 1 end
+			end
+		end
+		return (GroupMembersWithPlentyOfRegen < 3 and GroupMembersWithPlentyOfRegen < GroupMembersInSupportRange)
+	else return (not UnitHasBuffTimeLeft("player","Radiating Regeneration",5000)) end
+end
+-- #endregion
 
 local function Press(key)
 	LibPixelControl.SetIndOnFor(key,50)
@@ -367,6 +387,23 @@ local BlockCostPerChar = {
 local AutoFight = {}
 
 AutoFight[GIDEON] = function ()
+	if TopPriorityAutoFight() then
+	elseif Magicka()<15 and not Blocking() then HeavyAttack()
+	elseif LowestGroupHealthPercent()<40 then UseAbility(1)
+	elseif LowestGroupHealthPercent()<70 and Magicka()>70 then UseAbility(1)
+	elseif LowestGroupHealthPercentWithoutRegen()<80 then UseAbility(2)
+	elseif ShouldBlock() then Block()
+	elseif PreAttackAutoFight() then
+	elseif UltimateReady() and TargetIsHostileNpc() then UseUltimate()
+	elseif LowestGroupHealthPercentWithoutRegen()<90 then WeaveAbility(2)
+	elseif InMeleeRange and Magicka()>80 then WeaveAbility(5)
+	elseif SomeoneCouldUseRegen() and Magicka()>50 then WeaveAbility(2)
+	elseif TargetIsHostileNpc() and not Blocking() then HeavyAttack()
+	else DoNothing()
+	end
+end
+
+AutoFight["TEMPLATE"] = function ()
 	if TopPriorityAutoFight() then
 	elseif Health() < 80 then UseAbility(1)
 	elseif PreAttackAutoFight() then
