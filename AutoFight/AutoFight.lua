@@ -305,7 +305,7 @@ local function ShouldBlock()
 end
 
 -- begin Key Bindings
-ZO_CreateStringId("SI_BINDING_NAME_InMeleeRange-Generic", "InMeleeRange-Generic")
+ZO_CreateStringId("SI_BINDING_NAME_InMeleeRange-Dorian", "InMeleeRange-Dorian")
 function KeyBindInMeleeRangeYes()
 	InMeleeRange = true
 end
@@ -324,7 +324,7 @@ Suggested Logic Examples (for function AutoFightMain below)
 
 -- START CHARACTER-SPECIFIC CODE 01
 
-local CharacterFirstName = "Generic"
+local CharacterFirstName = "Dorian"
 BlockCost = 2160
 
 local function AutoFightMain()
