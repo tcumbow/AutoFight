@@ -1,10 +1,10 @@
--- START COMMON CODE 01
+-- #region COMMON CODE 01
 
 local ADDON_NAME = "AutoFight"
 local GIDEON = "Gideon Godiva"
 local GALILEI = "Galilei Godiva"
 
--- start local copies
+-- #region start local copies
 
 local VK1 = LibPixelControl.VK_1
 local VK2 = LibPixelControl.VK_2
@@ -23,7 +23,7 @@ local Print = d
 
 local GetUnitName = GetUnitName
 
--- end local copies
+-- #endregion local copies
 
 local CharName
 local BlockCost = 2160 -- default until overwritten by character-specific code
@@ -246,6 +246,8 @@ local function DoNothing()
 	EndHeavyAttack()
 	EndBlock()
 end
+
+-- #region Attack Begin Blocking
 local ABB = { } -- Attack Begin Blocking, saved variable
 local IncomingAttackETA = 0
 local IncomingAttackETR = 0
@@ -314,13 +316,14 @@ end
 local function ShouldBlock()
 	return (AttackIncoming() and StaminaPoints()>BlockCost and (IncomingAttackIsNotBlockTested or (IncomingAttackPredictedDamage/HealthPoints())>(BlockCost/StaminaPoints())))
 end
+-- #endregion
 
 local function SynergyName()
 	local synergyName = GetSynergyInfo()
 	return synergyName
 end
 
--- begin Key Bindings
+-- #region Key Bindings
 ZO_CreateStringId("SI_BINDING_NAME_InMeleeRange", "InMeleeRange")
 function KeyBindInMeleeRangeYes()
 	InMeleeRange = true
@@ -328,9 +331,9 @@ end
 function KeyBindInMeleeRangeNo()
 	InMeleeRange = false
 end
--- end Key Bindings
+-- #endregion
 
--- begin AutoFight standard inserts
+-- #region AutoFight standard inserts
 -- these are bits of logic that are common across all characters and need to be inserted at specific points (for example: after healing, but before attacking)
 
 local function TopPriorityAutoFight()
@@ -351,11 +354,11 @@ local function PreAttackAutoFight()
 	return true --signals to caller that this function did take an action and the caller function should not override that
 end
 
--- end AutoFight standard inserts
+-- #endregion
 
--- END COMMON CODE 01
+-- #endregion COMMON CODE 01
 
--- START CHARACTER-SPECIFIC CODE 01
+-- #region CHARACTER-SPECIFIC CODE 01
 
 local BlockCostPerChar = {
 	[GIDEON] = nil,
@@ -373,9 +376,9 @@ AutoFight[GIDEON] = function ()
 	end
 end
 
--- END CHARACTER-SPECIFIC CODE 01
+-- #endregion CHARACTER-SPECIFIC CODE 01
 
--- START COMMON CODE 02
+-- #region COMMON CODE 02
 
 local function InitializeVariables()
 	BlockCost = BlockCostPerChar[CharName] or BlockCost
@@ -397,5 +400,5 @@ local function OnAddonLoaded(event, name)
 end
 EVENT_MANAGER:RegisterForEvent(ADDON_NAME, EVENT_ADD_ON_LOADED, OnAddonLoaded)
 
--- END COMMON CODE 02
+-- #endregion COMMON CODE 02
 
