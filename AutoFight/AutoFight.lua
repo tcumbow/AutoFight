@@ -8,12 +8,14 @@ local VK3 = LibPixelControl.VK_3
 local VK4 = LibPixelControl.VK_4
 local VK5 = LibPixelControl.VK_5
 local VKR = LibPixelControl.VK_R
+local VKX = LibPixelControl.VK_X
 local VMLeft = LibPixelControl.VM_BTN_LEFT
 local VMRight = LibPixelControl.VM_BTN_RIGHT
 
 local Blocking = IsBlockActive
 local Now = GetGameTimeMilliseconds
 local Mounted = IsMounted
+local Print = d
 
 -- end local copies
 
@@ -228,6 +230,9 @@ local function Block()
 	EndHeavyAttack()
 	Hold(VMRight)
 end
+local function DoSynergy()
+	Press(VKX)
+end
 local function BlockInProgress()
 	return (WeAreHolding[VMRight])
 end
@@ -304,6 +309,11 @@ local function ShouldBlock()
 	return (AttackIncoming() and StaminaPoints()>BlockCost and (IncomingAttackIsNotBlockTested or (IncomingAttackPredictedDamage/HealthPoints())>(BlockCost/StaminaPoints())))
 end
 
+local function SynergyName()
+	local synergyName = GetSynergyInfo()
+	return synergyName
+end
+
 -- begin Key Bindings
 ZO_CreateStringId("SI_BINDING_NAME_InMeleeRange-Generic", "InMeleeRange-Generic")
 function KeyBindInMeleeRangeYes()
@@ -338,12 +348,23 @@ end
 
 -- START COMMON CODE 02
 
+local function Update100()
+	local synergyName = SynergyName()
+	local targetName = GetUnitName("reticleover")
+	if AutoFightShouldNotAct() then DoNothing()
+	elseif targetName == "Inmate" then
+		if synergyName == "Flesh Grenade" then DoSynergy()
+		else DoNothing() end
+	elseif synergyName == "Flesh Grenade" then DoNothing()
+	else AutoFightMain() end
+end
+
 local ADDON_NAME = "AutoFight-"..CharacterFirstName
 local function OnAddonLoaded(event, name)
 	if name == ADDON_NAME then
 		EVENT_MANAGER:UnregisterForEvent(ADDON_NAME, event)
 		if string.find(GetUnitName("player"),CharacterFirstName) then
-			EVENT_MANAGER:RegisterForUpdate(ADDON_NAME, 100, AutoFightMain)
+			EVENT_MANAGER:RegisterForUpdate(ADDON_NAME, 100, Update100)
 			EVENT_MANAGER:RegisterForEvent(ADDON_NAME, EVENT_COMBAT_EVENT, OnEventCombatEvent)
 			EVENT_MANAGER:AddFilterForEvent(ADDON_NAME, EVENT_COMBAT_EVENT, REGISTER_FILTER_TARGET_COMBAT_UNIT_TYPE, COMBAT_UNIT_TYPE_PLAYER)
 			ABB = ZO_SavedVars:NewCharacterIdSettings("ABB",0)
