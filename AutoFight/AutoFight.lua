@@ -439,7 +439,7 @@ end
 
 local function InitializeVariables()
 	BlockCost = BlockCostPerChar[CharName] or BlockCost
-	ABB = ZO_SavedVars:NewCharacterIdSettings("ABB",0)
+	ABB = ZO_SavedVars:NewAccountWide("ABB",0)
 	InitializeABBDataStructures()
 end
 
