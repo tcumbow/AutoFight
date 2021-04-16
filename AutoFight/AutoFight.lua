@@ -436,6 +436,23 @@ AutoFight[DORIAN] = function ()
 	end
 end
 
+AutoFight[JERICAH] = function ()
+	if TopPriorityAutoFight() then
+	elseif Health() < 40 and TargetIsHostileNpc() and MagickaPoints() > 3000 then UseAbility(4)
+	elseif Health() < 50 and TargetIsHostileNpc() and MagickaPoints() > 3000 then WeaveAbility(4)
+	elseif PreAttackAutoFight() then
+	elseif ShouldBlock() then Block()
+	elseif TargetShouldBeTaunted() and StaminaPoints()>1500 then WeaveAbility(2)
+	elseif not IHave("Major Resolve") and MagickaPoints()>2500 then WeaveAbility(3)
+	elseif not IHave("Minor Protection") and MagickaPoints()>4000 then WeaveAbility(5)
+	elseif TargetIsHostileNpc() and Stamina()>90 then WeaveAbility(1)
+	elseif TargetIsHostileNpc() and (not Blocking()) and (not BlockInProgress()) then HeavyAttack()
+	elseif UltimateReady() and TargetIsHostileNpc() then UseUltimate()
+	elseif TargetIsHostileNpc() and not Blocking() then HeavyAttack()
+	else DoNothing()
+	end
+end
+
 AutoFight["TEMPLATE"] = function ()
 	if TopPriorityAutoFight() then
 	elseif Health() < 80 then UseAbility(1)
