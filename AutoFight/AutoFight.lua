@@ -13,7 +13,7 @@ local NEVIRA = "Nevira Pendragon"
 local KRIN = "Krin Delvinay"
 local NISSA = "Nissa Forbus"
 local ANYA = "Anya Romaine"
-local MINA = "Mina Coperton"
+local MINA = "Mina Copperton"
 local KARRIE = "Karrie Lumin"
 
 -- #region start local copies
