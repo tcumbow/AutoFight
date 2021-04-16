@@ -453,6 +453,19 @@ AutoFight[JERICAH] = function ()
 	end
 end
 
+AutoFight[GALILEI] = function ()
+	if TopPriorityAutoFight() then
+	elseif PreAttackAutoFight() then
+	elseif ShouldBlock() then Block()
+	elseif Health() < 60 then WeaveAbility(4)
+	elseif UltimateReady() and TargetIsHostileNpc() and TargetIsMoreThanTrash() then UseUltimate()
+	elseif TargetIsHostileNpc() and not TargetHas("Minor Vulnerability") and Magicka() > 25 then WeaveAbility(3)
+	elseif TargetIsHostileNpc() and Stamina() > 40 then WeaveAbility(1)
+	elseif TargetIsHostileNpc() then HeavyAttack()
+	else DoNothing()
+	end
+end
+
 AutoFight["TEMPLATE"] = function ()
 	if TopPriorityAutoFight() then
 	elseif Health() < 80 then UseAbility(1)
