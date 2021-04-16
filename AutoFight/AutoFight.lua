@@ -466,6 +466,17 @@ AutoFight[GALILEI] = function ()
 	end
 end
 
+AutoFight[ELODIE] = function ()
+	if TopPriorityAutoFight() then
+	elseif PreAttackAutoFight() then
+	elseif ShouldBlock() then Block()
+	elseif UltimateReady() and TargetIsHostileNpc() then UseUltimate()
+	elseif TargetIsHostileNpc() and Magicka()>15 then WeaveAbility(1)
+	elseif not Blocking() then HeavyAttack()
+	else DoNothing()
+	end
+end
+
 AutoFight["TEMPLATE"] = function ()
 	if TopPriorityAutoFight() then
 	elseif Health() < 80 then UseAbility(1)
