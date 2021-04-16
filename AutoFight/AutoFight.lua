@@ -389,6 +389,19 @@ end
 
 local BlockCostPerChar = {
 	[GIDEON] = nil,
+	[GALILEI] = nil,
+	[DORIAN] = nil,
+	[GALILEI] = nil,
+	[HADARA] = nil,
+	[ELODIE] = nil,
+	[FREYA] = nil,
+	[JERICAH] = 1120,
+	[NEVIRA] = nil,
+	[KRIN] = nil,
+	[NISSA] = nil,
+	[ANYA] = nil,
+	[MINA] = nil,
+	[KARRIE] = nil,
 }
 
 local AutoFight = {}
