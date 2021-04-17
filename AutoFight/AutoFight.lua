@@ -530,6 +530,18 @@ AutoFight[KARRIE] = function ()
 	end
 end
 
+AutoFight[MINA] = function ()
+	if TopPriorityAutoFight() then
+	elseif Health() < 50 and MagickaPoints() > 4000 then UseAbility(5)
+	elseif PreAttackAutoFight() then
+	elseif ShouldBlock() then Block()
+	elseif UltimateReady() and TargetIsHostileNpc() and TargetIsMoreThanTrash() then UseUltimate()
+	elseif InMeleeRange and Magicka() > 20 then WeaveAbility(1)
+	elseif TargetIsHostileNpc() and not Blocking() then HeavyAttack()
+	else DoNothing()
+	end
+end
+
 AutoFight["TEMPLATE"] = function ()
 	if TopPriorityAutoFight() then
 	elseif Health() < 80 then UseAbility(1)
