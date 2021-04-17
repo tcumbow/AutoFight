@@ -160,7 +160,7 @@ local function InteractName()
 	return interactableName
 end
 local function AutoFightShouldNotAct()
-	return (not IsUnitInCombat('player') or IsReticleHidden() or IsUnitSwimming('player') or Mounted() or IHave("Bestial Transformation") or IHave("Skeevaton") or TargetName=="Plane Meld Rift" or InteractName()=="Cage of Torment" or InteractName()=="Daedric Alter")
+	return (not IsUnitInCombat('player') or IsReticleHidden() or IsUnitSwimming('player') or Mounted() or IHave("Bestial Transformation") or IHave("Skeevaton") or InteractName()=="Cage of Torment" or InteractName()=="Daedric Alter")
 end
 -- #region Healer functions
 local function LowestGroupHealthPercent()
@@ -388,6 +388,7 @@ local function PreAttackAutoFight()
 	elseif TargetName=="Lightning Aspect" then DoNothing()
 	elseif SynergyName == "Gravity Crush" then DoSynergy()
 	elseif SynergyName == "Combustion" then DoSynergy()
+	elseif TargetName == "Plane Meld Rift" then LightAttack()
 	else return false --signals to the caller that this function did NOT take an action; the caller function will continue down its elseif sequence
 	end
 	return true --signals to caller that this function did take an action and the caller function should not override that
