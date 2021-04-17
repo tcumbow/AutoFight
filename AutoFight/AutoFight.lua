@@ -477,6 +477,22 @@ AutoFight[ELODIE] = function ()
 	end
 end
 
+AutoFight[HADARA] = function ()
+	if TopPriorityAutoFight() then
+	elseif PreAttackAutoFight() then
+	elseif ShouldBlock() then Block()
+	elseif Magicka()<15 and not Blocking() and not HeavyAttackInProgress() then HeavyAttack()
+	elseif not IHave("Summon Twilight Matriarch") then UseAbility(4)
+	elseif LowestGroupHealthPercent()<40 then UseAbility(4)
+	elseif not IHave("Summon Volatile Familiar") then WeaveAbility(2)
+	elseif VolatilePulseReady() then WeaveAbility(2)
+	elseif not IHave("Major Sorcery") then WeaveAbility(3)
+	elseif UltimateReady() and TargetIsHostileNpc() then UseUltimate()
+	elseif TargetIsHostileNpc() then WeaveAbility(1)
+	else DoNothing()
+	end
+end
+
 AutoFight["TEMPLATE"] = function ()
 	if TopPriorityAutoFight() then
 	elseif Health() < 80 then UseAbility(1)
