@@ -561,6 +561,20 @@ AutoFight[ANYA] = function ()
 	end
 end
 
+AutoFight[KRIN] = function ()
+	if TopPriorityAutoFight() then
+	elseif Health() < 80 then UseAbility(1)
+	elseif PreAttackAutoFight() then
+	elseif ShouldBlock() then Block()
+	elseif TargetShouldBeTaunted then WeaveAbility(4)
+	elseif UltimateReady() and TargetIsHostileNpc() and TargetIsMoreThanTrash() then UseUltimate()
+	elseif not IHave("Summon Unstable Clannfear") then WeaveAbility(5)
+	elseif not IHave("Summon Twilight Matriarch") then WeaveAbility(2)
+	elseif TargetIsHostileNpc() and not Blocking() then HeavyAttack()
+	else DoNothing()
+	end
+end
+
 AutoFight["TEMPLATE"] = function ()
 	if TopPriorityAutoFight() then
 	elseif Health() < 80 then UseAbility(1)
