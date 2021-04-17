@@ -150,7 +150,7 @@ local function TargetCouldBeTaunted()
 	return (TargetIsHostileNpc() and not TargetHas("Taunt"))
 end
 local function TargetShouldBeTaunted()
-	return (TargetCouldBeTaunted() and (TargetIsBoss() or (Stamina()>50 and TargetIsMoreThanTrash())))
+	return (TargetCouldBeTaunted() and (TargetIsBoss() or (Stamina()>50 and TargetIsMoreThanTrash()) or (Stamina()>90) ))
 end
 local function InteractVerb()
 	local action, _, _, _, _ = GetGameCameraInteractableActionInfo()
