@@ -518,6 +518,17 @@ AutoFight["TEMPLATE"] = function ()
 	end
 end
 
+AutoFight[KARRIE] = function ()
+	if TopPriorityAutoFight() then
+	elseif PreAttackAutoFight() then
+	elseif ShouldBlock() then Block()
+	elseif UltimateReady() and TargetIsHostileNpc() and TargetIsMoreThanTrash() then UseUltimate()
+	elseif TargetIsHostileNpc() and not Blocking() and Stamina() > 50 then LightAttack()
+	elseif TargetIsHostileNpc() and not Blocking() then HeavyAttack()
+	else DoNothing()
+	end
+end
+
 -- #endregion CHARACTER-SPECIFIC CODE 01
 
 -- #region COMMON CODE 02
