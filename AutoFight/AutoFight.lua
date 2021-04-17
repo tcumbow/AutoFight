@@ -25,6 +25,7 @@ local VK4 = LibPixelControl.VK_4
 local VK5 = LibPixelControl.VK_5
 local VKR = LibPixelControl.VK_R
 local VKX = LibPixelControl.VK_X
+local VKF9 = LibPixelControl.VK_F9
 local VMLeft = LibPixelControl.VM_BTN_LEFT
 local VMRight = LibPixelControl.VM_BTN_RIGHT
 
@@ -268,6 +269,10 @@ local function Block()
 	EndHeavyAttack()
 	Hold(VMRight)
 end
+local function BreakFree()
+	EndHeavyAttack()
+	Press(VKF9)
+end
 local function DoSynergy()
 	Press(VKX)
 end
@@ -345,6 +350,10 @@ local function OnEventCombatEvent( eventCode, result, isError, abilityName, abil
 		end
 	end
 end
+local Stunned = false
+local function OnEventStunStateChanged(_,StunState)
+	Stunned = StunState
+end
 local function ShouldBlock()
 	return (AttackIncoming() and StaminaPoints()>BlockCost and (IncomingAttackIsNotBlockTested or (IncomingAttackPredictedDamage/HealthPoints())>(BlockCost/StaminaPoints())))
 end
@@ -367,6 +376,7 @@ local function TopPriorityAutoFight()
 	SynergyName = GetSynergyInfo()
 	TargetName = GetUnitName("reticleover")
 	if AutoFightShouldNotAct() then DoNothing()
+	elseif Stunned then BreakFree()
 	elseif SynergyName == "Flesh Grenade" and TargetName == "Inmate" then DoSynergy()
 	else return false --signals to the caller that this function did NOT take an action; the caller function will continue down its elseif sequence
 	end
@@ -550,6 +560,7 @@ local function OnAddonLoaded(event, name)
 			EVENT_MANAGER:RegisterForUpdate(ADDON_NAME, 100, AutoFight[CharName]) -- register the character-specific AutoFight function to be called every 100ms
 			EVENT_MANAGER:RegisterForEvent(ADDON_NAME, EVENT_COMBAT_EVENT, OnEventCombatEvent)
 			EVENT_MANAGER:AddFilterForEvent(ADDON_NAME, EVENT_COMBAT_EVENT, REGISTER_FILTER_TARGET_COMBAT_UNIT_TYPE, COMBAT_UNIT_TYPE_PLAYER)
+			EVENT_MANAGER:RegisterForEvent(ADDON_NAME, EVENT_PLAYER_STUNNED_STATE_CHANGED, OnEventStunStateChanged)
 		end
 	end
 end
