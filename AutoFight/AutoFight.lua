@@ -388,12 +388,12 @@ end
 -- #region CHARACTER-SPECIFIC CODE 01
 
 local BlockCostPerChar = {
-	[GIDEON] = nil,
+	[GIDEON] = 2020,
 	[GALILEI] = nil,
 	[DORIAN] = nil,
 	[GALILEI] = nil,
 	[HADARA] = nil,
-	[ELODIE] = nil,
+	[ELODIE] = 1943,
 	[FREYA] = nil,
 	[JERICAH] = 1120,
 	[NEVIRA] = nil,
@@ -401,7 +401,7 @@ local BlockCostPerChar = {
 	[NISSA] = nil,
 	[ANYA] = nil,
 	[MINA] = nil,
-	[KARRIE] = nil,
+	[KARRIE] = 1619,
 }
 
 local AutoFight = {}
