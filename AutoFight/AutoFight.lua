@@ -493,6 +493,20 @@ AutoFight[HADARA] = function ()
 	end
 end
 
+AutoFight[FREYA] = function ()
+	if TopPriorityAutoFight() then
+	elseif Health() < 60 and StaminaPoints() > 4000 then UseAbility(4)
+	elseif PreAttackAutoFight() then
+	elseif ShouldBlock() then Block()
+	elseif UltimateReady() and TargetIsHostileNpc() then UseUltimate()
+	elseif not IHave("Molten Armaments") and MagickaPoints() > 10000 and TargetIsHostileNpc() then WeaveAbility(3)
+	elseif not IHave("Flames of Oblivion") and MagickaPoints() > 10000 and TargetIsHostileNpc() then WeaveAbility(5)
+	elseif TargetIsHostileNpc() and StaminaPoints() > 10000 then WeaveAbility(1)
+	elseif TargetIsHostileNpc() and not Blocking() then HeavyAttack()
+	else DoNothing()
+	end
+end
+
 AutoFight["TEMPLATE"] = function ()
 	if TopPriorityAutoFight() then
 	elseif Health() < 80 then UseAbility(1)
