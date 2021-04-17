@@ -507,23 +507,23 @@ AutoFight[FREYA] = function ()
 	end
 end
 
-AutoFight["TEMPLATE"] = function ()
-	if TopPriorityAutoFight() then
-	elseif Health() < 80 then UseAbility(1)
-	elseif PreAttackAutoFight() then
-	elseif ShouldBlock() then Block()
-	elseif UltimateReady() and TargetIsHostileNpc() then UseUltimate()
-	elseif TargetIsHostileNpc() and not Blocking() then HeavyAttack()
-	else DoNothing()
-	end
-end
-
 AutoFight[KARRIE] = function ()
 	if TopPriorityAutoFight() then
 	elseif PreAttackAutoFight() then
 	elseif ShouldBlock() then Block()
 	elseif UltimateReady() and TargetIsHostileNpc() and TargetIsMoreThanTrash() then UseUltimate()
 	elseif TargetIsHostileNpc() and not Blocking() and Stamina() > 50 then LightAttack()
+	elseif TargetIsHostileNpc() and not Blocking() then HeavyAttack()
+	else DoNothing()
+	end
+end
+
+AutoFight["TEMPLATE"] = function ()
+	if TopPriorityAutoFight() then
+	elseif Health() < 80 then UseAbility(1)
+	elseif PreAttackAutoFight() then
+	elseif ShouldBlock() then Block()
+	elseif UltimateReady() and TargetIsHostileNpc() then UseUltimate()
 	elseif TargetIsHostileNpc() and not Blocking() then HeavyAttack()
 	else DoNothing()
 	end
