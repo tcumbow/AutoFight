@@ -172,7 +172,7 @@ local function LowestGroupHealthPercent()
 			local unitTag = GetGroupUnitTagByIndex(i)
 			local currentHp, maxHp, effectiveMaxHp = GetUnitPower(unitTag, POWERTYPE_HEALTH)
 			local HpPercent = currentHp / maxHp
-			if HpPercent < LowestGroupHealthPercent and IsUnitInGroupSupportRange(unitTag) and not IsUnitDead(unitTag) and GetUnitType(unitTag) == 1 then
+			if HpPercent < LowestGroupHealthPercent and IsUnitInGroupSupportRange(unitTag) and not IsUnitDead(unitTag) and GetUnitType(unitTag) == 1 and not DoesUnitHaveResurrectPending(unitTag) then
 				LowestGroupHealthPercent = HpPercent
 			end
 		end
@@ -192,7 +192,7 @@ local function LowestGroupHealthPercentWithoutRegen()
 			local unitTag = GetGroupUnitTagByIndex(i)
 			local currentHp, maxHp, effectiveMaxHp = GetUnitPower(unitTag, POWERTYPE_HEALTH)
 			local HpPercent = currentHp / maxHp
-			if HpPercent < LowestGroupHealthPercent and not UnitHasRegen(unitTag) and IsUnitInGroupSupportRange(unitTag) and not IsUnitDead(unitTag) and GetUnitType(unitTag) == 1 then
+			if HpPercent < LowestGroupHealthPercent and not UnitHasRegen(unitTag) and IsUnitInGroupSupportRange(unitTag) and not IsUnitDead(unitTag) and GetUnitType(unitTag) == 1 and not DoesUnitHaveResurrectPending(unitTag) then
 				LowestGroupHealthPercent = HpPercent
 			end
 		end
@@ -212,7 +212,7 @@ local function SomeoneCouldUseRegen()
 		local GroupMembersInSupportRange = 0
 		for i = 1, GroupSize do
 			unitTag = GetGroupUnitTagByIndex(i)
-			if IsUnitInGroupSupportRange(unitTag) and not IsUnitDead(unitTag) and GetUnitType(unitTag) == 1 then
+			if IsUnitInGroupSupportRange(unitTag) and not IsUnitDead(unitTag) and GetUnitType(unitTag) == 1 and not DoesUnitHaveResurrectPending(unitTag) then
 				GroupMembersInSupportRange = GroupMembersInSupportRange + 1
 				if not UnitHasRegen(unitTag) then return true end
 				if UnitHasBuffTimeLeft(unitTag,"Radiating Regeneration",5000) then
