@@ -543,6 +543,17 @@ AutoFight[MINA] = function ()
 	end
 end
 
+AutoFight[ANYA] = function ()
+	if TopPriorityAutoFight() then
+	elseif PreAttackAutoFight() then
+	elseif ShouldBlock() then Block()
+	elseif UltimateReady() and TargetIsHostileNpc() and TargetIsMoreThanTrash() then UseUltimate()
+	elseif not IHave("Skeletal Archer") and Stamina() > 50 then WeaveAbility(4)
+	elseif TargetIsHostileNpc() and not Blocking() then HeavyAttack()
+	else DoNothing()
+	end
+end
+
 AutoFight["TEMPLATE"] = function ()
 	if TopPriorityAutoFight() then
 	elseif Health() < 80 then UseAbility(1)
