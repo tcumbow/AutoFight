@@ -161,7 +161,7 @@ local function InteractName()
 	return interactableName
 end
 local function AutoFightShouldNotAct()
-	return (not IsUnitInCombat('player') or IsReticleHidden() or IsUnitSwimming('player') or Mounted() or IHave("Bestial Transformation") or IHave("Skeevaton") or InteractName()=="Cage of Torment" or IsUnitBeingResurrected("reticleover"))
+	return (not IsUnitInCombat('player') or IsReticleHidden() or IsUnitSwimming('player') or IsUnitDead('player') or Mounted() or IHave("Bestial Transformation") or IHave("Skeevaton") or InteractName()=="Cage of Torment" or IsUnitBeingResurrected("reticleover"))
 end
 -- #region Healer functions
 local function LowestGroupHealthPercent()
