@@ -447,7 +447,7 @@ AutoFight[JERICAH] = function ()
 	elseif not IHave("Minor Protection") and MagickaPoints()>4000 then WeaveAbility(5)
 	elseif TargetIsHostileNpc() and Stamina()>90 then WeaveAbility(1)
 	elseif TargetIsHostileNpc() and (not Blocking()) and (not BlockInProgress()) then HeavyAttack()
-	elseif UltimateReady() and TargetIsHostileNpc() then UseUltimate()
+	elseif UltimateReady() and TargetIsHostileNpc() and TargetIsMoreThanTrash() then UseUltimate()
 	elseif TargetIsHostileNpc() and not Blocking() then HeavyAttack()
 	else DoNothing()
 	end
@@ -470,7 +470,7 @@ AutoFight[ELODIE] = function ()
 	if TopPriorityAutoFight() then
 	elseif PreAttackAutoFight() then
 	elseif ShouldBlock() then Block()
-	elseif UltimateReady() and TargetIsHostileNpc() then UseUltimate()
+	elseif UltimateReady() and TargetIsHostileNpc() and TargetIsMoreThanTrash() then UseUltimate()
 	elseif TargetIsHostileNpc() and Magicka()>15 then WeaveAbility(1)
 	elseif not Blocking() then HeavyAttack()
 	else DoNothing()
