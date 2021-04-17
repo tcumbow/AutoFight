@@ -90,7 +90,9 @@
         "ACTION_RESULT_BLOCKED_DAMAGE",
         "REGISTER_FILTER_TARGET_COMBAT_UNIT_TYPE",
         "DoSpecialAction",
-        "GetSynergyInfo"
+        "GetSynergyInfo",
+        "IsUnitBeingResurrected",
+        "DoesUnitHaveResurrectPending"
     ],
     "cSpell.words": [
         "ANYA",
