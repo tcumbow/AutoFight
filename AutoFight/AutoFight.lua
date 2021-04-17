@@ -492,7 +492,7 @@ AutoFight[HADARA] = function ()
 	if TopPriorityAutoFight() then
 	elseif PreAttackAutoFight() then
 	elseif ShouldBlock() then Block()
-	elseif Magicka()<15 and not Blocking() and not HeavyAttackInProgress() then HeavyAttack()
+	elseif Magicka()<15 and not Blocking() then HeavyAttack()
 	elseif not IHave("Summon Twilight Matriarch") then UseAbility(4)
 	elseif LowestGroupHealthPercent()<40 then UseAbility(4)
 	elseif not IHave("Summon Volatile Familiar") then WeaveAbility(2)
