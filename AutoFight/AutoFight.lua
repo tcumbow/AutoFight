@@ -23,6 +23,7 @@ local VK2 = LibPixelControl.VK_2
 local VK3 = LibPixelControl.VK_3
 local VK4 = LibPixelControl.VK_4
 local VK5 = LibPixelControl.VK_5
+local VKE = LibPixelControl.VK_E
 local VKR = LibPixelControl.VK_R
 local VKX = LibPixelControl.VK_X
 local VKF9 = LibPixelControl.VK_F9
@@ -160,7 +161,7 @@ local function InteractName()
 	return interactableName
 end
 local function AutoFightShouldNotAct()
-	return (not IsUnitInCombat('player') or IsReticleHidden() or IsUnitSwimming('player') or Mounted() or IHave("Bestial Transformation") or IHave("Skeevaton") or InteractName()=="Cage of Torment" or InteractName()=="Daedric Alter")
+	return (not IsUnitInCombat('player') or IsReticleHidden() or IsUnitSwimming('player') or Mounted() or IHave("Bestial Transformation") or IHave("Skeevaton") or InteractName()=="Cage of Torment")
 end
 -- #region Healer functions
 local function LowestGroupHealthPercent()
@@ -273,6 +274,10 @@ local function BreakFree()
 	EndHeavyAttack()
 	Press(VKF9)
 end
+local function DoInteract()
+	EndHeavyAttack()
+	Press(VKE)
+end
 local function DoSynergy()
 	Press(VKX)
 end
@@ -378,6 +383,7 @@ local function TopPriorityAutoFight()
 	if AutoFightShouldNotAct() then DoNothing()
 	elseif Stunned then BreakFree()
 	elseif SynergyName == "Flesh Grenade" and TargetName == "Inmate" then DoSynergy()
+	elseif InteractName() == "Daedric Alter" then DoInteract()
 	else return false --signals to the caller that this function did NOT take an action; the caller function will continue down its elseif sequence
 	end
 	return true --signals to caller that this function did take an action and the caller function should not override that
