@@ -224,6 +224,7 @@ local function SomeoneCouldUseRegen()
 end
 -- #endregion
 
+-- #region Actions
 local function Press(key)
 	LibPixelControl.SetIndOnFor(key,50)
 end
@@ -288,6 +289,8 @@ local function DoNothing()
 	EndHeavyAttack()
 	EndBlock()
 end
+
+-- #endregion
 
 -- #region Attack Begin Blocking
 local ABB = { } -- Attack Begin Blocking, saved variable
