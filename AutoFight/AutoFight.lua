@@ -269,6 +269,7 @@ local function HeavyAttackInProgress()
 	return (WeAreHolding[VMLeft])
 end
 local function LightAttack()
+	EndBlock()
 	EndHeavyAttack()
 	Press(VMLeft)
 end
@@ -288,10 +289,12 @@ local function Block()
 	Hold(VMRight)
 end
 local function BreakFree()
+	EndBlock()
 	EndHeavyAttack()
 	Press(VKF9)
 end
 local function DoInteract()
+	EndBlock()
 	EndHeavyAttack()
 	Press(VKE)
 end
@@ -489,7 +492,7 @@ AutoFight[JERICAH] = function ()
 	elseif not IHave("Major Resolve") and MagickaPoints()>2500 then WeaveAbility(3)
 	elseif not IHave("Minor Protection") and MagickaPoints()>4000 then WeaveAbility(5)
 	elseif TargetIsHostileNpc() and Stamina()>90 then WeaveAbility(1)
-	elseif TargetIsHostileNpc() and (not Blocking()) and (not BlockInProgress()) then HeavyAttack()
+	elseif TargetIsHostileNpc() and (not Blocking()) and (not BlockInProgress()) then HeavyAttack() -- do we really need BlockInProgress?
 	elseif UltimateReady() and TargetIsHostileNpc() and TargetIsMoreThanTrash() then UseUltimate()
 	elseif TargetIsHostileNpc() and not Blocking() then HeavyAttack()
 	else DoNothing()
