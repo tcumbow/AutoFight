@@ -25,6 +25,7 @@ local VK3 = LibPixelControl.VK_3
 local VK4 = LibPixelControl.VK_4
 local VK5 = LibPixelControl.VK_5
 local VKE = LibPixelControl.VK_E
+local VKQ = LibPixelControl.VK_Q
 local VKR = LibPixelControl.VK_R
 local VKX = LibPixelControl.VK_X
 local VKF9 = LibPixelControl.VK_F9
@@ -297,6 +298,9 @@ local function DoInteract()
 end
 local function DoSynergy()
 	Press(VKX)
+end
+local function DoQuickslot()
+	Press(VKQ)
 end
 local function BlockInProgress()
 	return (WeAreHolding[VMRight])
