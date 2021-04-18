@@ -15,6 +15,7 @@ local NISSA = "Nissa Forbus"
 local ANYA = "Anya Romaine"
 local MINA = "Mina Copperton"
 local KARRIE = "Karrie Lumin"
+local CROWN_TRI_POTION = "Crown Tri-Restoration Potion"
 
 -- #region start local copies
 
