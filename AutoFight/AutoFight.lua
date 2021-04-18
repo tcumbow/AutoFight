@@ -419,6 +419,7 @@ local function PreAttackAutoFight()
 	elseif SynergyName == "Gravity Crush" then DoSynergy()
 	elseif SynergyName == "Combustion" then DoSynergy()
 	elseif TargetName == "Plane Meld Rift" then LightAttack()
+	elseif Health() < 50 and QuickslotName() == CROWN_TRI_POTION and QuickslotIsReady() then DoQuickslot()
 	else return false --signals to the caller that this function did NOT take an action; the caller function will continue down its elseif sequence
 	end
 	return true --signals to caller that this function did take an action and the caller function should not override that
