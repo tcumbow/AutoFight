@@ -222,6 +222,18 @@ local function SomeoneCouldUseRegen()
 		return (GroupMembersWithPlentyOfRegen < 3 and GroupMembersWithPlentyOfRegen < GroupMembersInSupportRange)
 	else return (not UnitHasBuffTimeLeft("player","Radiating Regeneration",5000)) end
 end
+
+local function QuickslotIsReady()
+	local timeRemaining, _, global, _ = GetSlotCooldownInfo(GetCurrentQuickslot())
+	local potionsAvailable = GetSlotItemCount(GetCurrentQuickslot())
+	if potionsAvailable==nil then return false end
+	if timeRemaining==0 and global and potionsAvailable > 0 then
+		return true
+	else
+		return false
+	end
+end
+
 -- #endregion
 
 -- #region Actions
