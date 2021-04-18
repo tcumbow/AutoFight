@@ -74,6 +74,9 @@ local function UltimateReady()
 	local MyUltimate, _ = GetUnitPower('player', POWERTYPE_ULTIMATE)
 	return (MyUltimate >= GetAbilityCost(GetSlotBoundId(8)))
 end
+local function QuickslotName()
+	return GetSlotName(GetCurrentQuickslot())
+end
 local function UnitHasRegen(unitTag)
 	local numBuffs = GetNumBuffs(unitTag)
 	if numBuffs > 0 then
