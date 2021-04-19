@@ -46,6 +46,14 @@ local InMeleeRange = false
 local SynergyName
 local TargetName
 
+local function Log(text)
+end
+
+function AutoFightEnableDiagnostics()
+	Log = Print
+end
+
+
 local function Health()
 	local MyHealth, MyMaxHealth = GetUnitPower('player', POWERTYPE_HEALTH)
 	return ((MyHealth/MyMaxHealth)*100)
@@ -261,6 +269,7 @@ end
 local function HeavyAttack()
 	EndBlock()
 	Hold(VMLeft)
+	Log("HeavyAttack")
 end
 local function EndHeavyAttack()
 	Release(VMLeft)
@@ -272,37 +281,46 @@ local function LightAttack()
 	EndBlock()
 	EndHeavyAttack()
 	Press(VMLeft)
+	Log("LightAttack")
 end
 local function UseAbility(num)
 	EndHeavyAttack()
 	Press(VK1+num-1)
+	Log("UseAbility")
 end
 local function UseUltimate()
 	EndHeavyAttack()
 	Press(VKR)
+	Log("UseUltimate")
 end
 local function WeaveAbility(num)
 	Press(VK1+num-1)
+	Log("WeaveAbility")
 end
 local function Block()
 	EndHeavyAttack()
 	Hold(VMRight)
+	Log("Block")
 end
 local function BreakFree()
 	EndBlock()
 	EndHeavyAttack()
 	Press(VKF9)
+	Log("BreakFree")
 end
 local function DoInteract()
 	EndBlock()
 	EndHeavyAttack()
 	Press(VKE)
+	Log("DoInteract")
 end
 local function DoSynergy()
 	Press(VKX)
+	Log("DoSynergy")
 end
 local function DoQuickslot()
 	Press(VKQ)
+	Log("DoQuickslot")
 end
 local function BlockInProgress()
 	return (WeAreHolding[VMRight])
@@ -310,6 +328,7 @@ end
 local function DoNothing()
 	EndHeavyAttack()
 	EndBlock()
+	Log("DoNothing")
 end
 
 -- #endregion
