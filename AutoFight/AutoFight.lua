@@ -440,25 +440,10 @@ end
 
 --#region CHARACTER-SPECIFIC CODE 01
 
-local BlockCostPerChar = {
-	[GIDEON] = 2020,
-	[GALILEI] = nil,
-	[DORIAN] = nil,
-	[GALILEI] = nil,
-	[HADARA] = 2012,
-	[ELODIE] = 1943,
-	[FREYA] = nil,
-	[JERICAH] = 1120,
-	[NEVIRA] = nil,
-	[KRIN] = 1068,
-	[NISSA] = nil,
-	[ANYA] = nil,
-	[MINA] = nil,
-	[KARRIE] = 1619,
-}
-
+local BlockCostPerChar = {}
 local AutoFight = {}
 
+BlockCostPerChar[GIDEON] = 2020
 AutoFight[GIDEON] = function ()
 	if TopPriorityAutoFight() then
 	elseif Magicka()<15 and not Blocking() then HeavyAttack()
@@ -476,6 +461,7 @@ AutoFight[GIDEON] = function ()
 	end
 end
 
+BlockCostPerChar[DORIAN] = nil
 AutoFight[DORIAN] = function ()
 	if TopPriorityAutoFight() then
 	elseif Health() < 80 and Magicka() > 80 then WeaveAbility(4)
@@ -489,6 +475,7 @@ AutoFight[DORIAN] = function ()
 	end
 end
 
+BlockCostPerChar[JERICAH] = 1120
 AutoFight[JERICAH] = function ()
 	if TopPriorityAutoFight() then
 	elseif Health() < 40 and TargetIsHostileNpc() and MagickaPoints() > 3000 then UseAbility(4)
@@ -509,6 +496,7 @@ AutoFight[JERICAH] = function ()
 	end
 end
 
+BlockCostPerChar[GALILEI] = nil
 AutoFight[GALILEI] = function ()
 	if TopPriorityAutoFight() then
 	elseif PreAttackAutoFight() then
@@ -522,6 +510,7 @@ AutoFight[GALILEI] = function ()
 	end
 end
 
+BlockCostPerChar[ELODIE] = 1943
 AutoFight[ELODIE] = function ()
 	if TopPriorityAutoFight() then
 	elseif PreAttackAutoFight() then
@@ -533,6 +522,7 @@ AutoFight[ELODIE] = function ()
 	end
 end
 
+BlockCostPerChar[HADARA] = 2012
 AutoFight[HADARA] = function ()
 	if TopPriorityAutoFight() then
 	elseif PreAttackAutoFight() then
@@ -549,6 +539,7 @@ AutoFight[HADARA] = function ()
 	end
 end
 
+BlockCostPerChar[FREYA] = nil
 AutoFight[FREYA] = function ()
 	if TopPriorityAutoFight() then
 	elseif Health() < 60 and StaminaPoints() > 4000 then UseAbility(4)
@@ -563,6 +554,7 @@ AutoFight[FREYA] = function ()
 	end
 end
 
+BlockCostPerChar[KARRIE] = 1619
 AutoFight[KARRIE] = function ()
 	if TopPriorityAutoFight() then
 	elseif PreAttackAutoFight() then
@@ -575,6 +567,7 @@ AutoFight[KARRIE] = function ()
 	end
 end
 
+BlockCostPerChar[MINA] = nil
 AutoFight[MINA] = function ()
 	if TopPriorityAutoFight() then
 	elseif Health() < 50 and MagickaPoints() > 4000 then UseAbility(5)
@@ -587,6 +580,7 @@ AutoFight[MINA] = function ()
 	end
 end
 
+BlockCostPerChar[ANYA] = nil
 AutoFight[ANYA] = function ()
 	if TopPriorityAutoFight() then
 	elseif PreAttackAutoFight() then
@@ -598,6 +592,7 @@ AutoFight[ANYA] = function ()
 	end
 end
 
+BlockCostPerChar[KRIN] = 1068
 AutoFight[KRIN] = function ()
 	if TopPriorityAutoFight() then
 	elseif PreAttackAutoFight() then
@@ -611,6 +606,7 @@ AutoFight[KRIN] = function ()
 	end
 end
 
+BlockCostPerChar["TEMPLATE"] = nil
 AutoFight["TEMPLATE"] = function ()
 	if TopPriorityAutoFight() then
 	elseif Health() < 80 then UseAbility(1)
