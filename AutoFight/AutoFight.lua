@@ -493,13 +493,16 @@ AutoFight[JERICAH] = function ()
 	elseif Health() < 50 and TargetIsHostileNpc() and MagickaPoints() > 3000 then WeaveAbility(4)
 	elseif PreAttackAutoFight() then
 	elseif ShouldBlock() then Block()
-	elseif TargetShouldBeTaunted() and StaminaPoints()>1500 then WeaveAbility(2)
-	elseif not IHave("Major Resolve") and MagickaPoints()>2500 then WeaveAbility(3)
-	elseif not IHave("Minor Protection") and MagickaPoints()>4000 then WeaveAbility(5)
-	elseif TargetIsHostileNpc() and Stamina()>90 then WeaveAbility(1)
-	elseif TargetIsHostileNpc() and (not Blocking()) and (not BlockInProgress()) then HeavyAttack() -- do we really need BlockInProgress?
+	elseif TargetShouldBeTaunted() and ActiveBar()==1 and StaminaPoints()>1500 then WeaveAbility(2)
+	elseif ActiveBar()==2 and not IHave("Skeletal Archer") and StaminaPoints()>4000 then WeaveAbility(5)
+	elseif ActiveBar()==2 and not IHave("Blighted Blastbones") and StaminaPoints()>5000 then WeaveAbility(2)
+	elseif not IHave("Major Resolve") and ActiveBar()==1 and MagickaPoints()>2500 then WeaveAbility(3)
+	elseif not IHave("Minor Protection") and ActiveBar()==1 and MagickaPoints()>4000 then WeaveAbility(5)
 	elseif UltimateReady() and TargetIsHostileNpc() and TargetIsMoreThanTrash() then UseUltimate()
+	elseif TargetIsHostileNpc() and ActiveBar()==1 and Stamina()>90 then WeaveAbility(1)
+	elseif TargetIsHostileNpc() and ActiveBar()==2 and Stamina()>40 then WeaveAbility(1)
 	elseif TargetIsHostileNpc() and not Blocking() then HeavyAttack()
+	elseif not IHave("Major Resolve") and MagickaPoints()>2500 then WeaveAbility(3)
 	else DoNothing()
 	end
 end
