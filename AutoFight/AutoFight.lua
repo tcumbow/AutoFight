@@ -42,12 +42,15 @@ local GetUnitName = GetUnitName
 
 --#endregion
 
+--#region Info variables
 local CharName
 local BlockCost = 2160 -- default until overwritten by character-specific code
 local InMeleeRange = false
 local SynergyName
 local TargetName
+--#endregion
 
+--#region Common info functions
 local function Health()
 	local MyHealth, MyMaxHealth = GetUnitPower('player', POWERTYPE_HEALTH)
 	return ((MyHealth/MyMaxHealth)*100)
@@ -152,12 +155,6 @@ end
 local function TargetIsMoreThanTrash()
 	return (GetUnitDifficulty("reticleover") >= 2)
 end
-local function TargetCouldBeTaunted()
-	return (TargetIsHostileNpc() and not TargetHas("Taunt"))
-end
-local function TargetShouldBeTaunted()
-	return (TargetCouldBeTaunted() and (TargetIsBoss() or (Stamina()>50 and TargetIsMoreThanTrash()) or (Stamina()>90) ))
-end
 local function InteractVerb()
 	local action, _, _, _, _ = GetGameCameraInteractableActionInfo()
 	return action
@@ -166,9 +163,8 @@ local function InteractName()
 	local _, interactableName, _, _, _ = GetGameCameraInteractableActionInfo()
 	return interactableName
 end
-local function AutoFightShouldNotAct()
-	return (not IsUnitInCombat('player') or IsReticleHidden() or IsUnitSwimming('player') or IsUnitDead('player') or Mounted() or IHave("Bestial Transformation") or IHave("Skeevaton") or InteractName()=="Cage of Torment" or IsUnitBeingResurrected("reticleover"))
-end
+--#endregion
+
 --#region Healer functions
 local function LowestGroupHealthPercent()
 	local GroupSize = GetGroupSize()
@@ -245,6 +241,15 @@ local function ActiveBar()
 	return barNum
 end
 
+--#endregion
+
+ --#region Tank functions
+local function TargetCouldBeTaunted()
+	return (TargetIsHostileNpc() and not TargetHas("Taunt"))
+end
+local function TargetShouldBeTaunted()
+	return (TargetCouldBeTaunted() and (TargetIsBoss() or (Stamina()>50 and TargetIsMoreThanTrash()) or (Stamina()>90) ))
+end
 --#endregion
 
 --#region Actions
@@ -408,6 +413,9 @@ end
 
 --#region AutoFight standard inserts
 -- these are bits of logic that are common across all characters and need to be inserted at specific points (for example: after healing, but before attacking)
+local function AutoFightShouldNotAct()
+	return (not IsUnitInCombat('player') or IsReticleHidden() or IsUnitSwimming('player') or IsUnitDead('player') or Mounted() or IHave("Bestial Transformation") or IHave("Skeevaton") or InteractName()=="Cage of Torment" or IsUnitBeingResurrected("reticleover"))
+end
 
 local function TopPriorityAutoFight()
 	SynergyName = GetSynergyInfo()
