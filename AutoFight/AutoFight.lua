@@ -238,6 +238,11 @@ local function QuickslotIsReady()
 	end
 end
 
+local function ActiveBar()
+	local barNum = GetActiveWeaponPairInfo()
+	return barNum
+end
+
 -- #endregion
 
 -- #region Actions
