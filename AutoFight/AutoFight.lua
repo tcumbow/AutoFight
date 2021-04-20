@@ -18,7 +18,7 @@ local KARRIE = "Karrie Lumin"
 local CROWN_TRI_POTION = "Crown Tri-Restoration Potion"
 --#endregion
 
---#region start local copies
+--#region Local copies
 
 local VK1 = LibPixelControl.VK_1
 local VK2 = LibPixelControl.VK_2
@@ -40,7 +40,7 @@ local Print = d
 
 local GetUnitName = GetUnitName
 
--- #endregion local copies
+--#endregion
 
 local CharName
 local BlockCost = 2160 -- default until overwritten by character-specific code
@@ -245,7 +245,7 @@ local function ActiveBar()
 	return barNum
 end
 
--- #endregion
+--#endregion
 
 --#region Actions
 local function Press(key)
@@ -319,7 +319,7 @@ local function DoNothing()
 	EndBlock()
 end
 
--- #endregion
+--#endregion
 
 --#region Attack Begin Blocking
 local ABB = { } -- Attack Begin Blocking, saved variable
@@ -394,7 +394,7 @@ end
 local function ShouldBlock()
 	return (AttackIncoming() and StaminaPoints()>BlockCost and (IncomingAttackIsNotBlockTested or (IncomingAttackPredictedDamage/HealthPoints())>(BlockCost/StaminaPoints())))
 end
--- #endregion
+--#endregion
 
 --#region Key Bindings
 ZO_CreateStringId("SI_BINDING_NAME_InMeleeRange", "InMeleeRange")
@@ -404,7 +404,7 @@ end
 function KeyBindInMeleeRangeNo()
 	InMeleeRange = false
 end
--- #endregion
+--#endregion
 
 --#region AutoFight standard inserts
 -- these are bits of logic that are common across all characters and need to be inserted at specific points (for example: after healing, but before attacking)
@@ -434,9 +434,9 @@ local function PreAttackAutoFight()
 	return true --signals to caller that this function did take an action and the caller function should not override that
 end
 
--- #endregion
+--#endregion
 
--- #endregion COMMON CODE 01
+--#endregion
 
 --#region CHARACTER-SPECIFIC CODE 01
 
@@ -622,7 +622,7 @@ AutoFight["TEMPLATE"] = function ()
 	end
 end
 
--- #endregion CHARACTER-SPECIFIC CODE 01
+--#endregion
 
 --#region COMMON CODE 02
 
@@ -647,5 +647,5 @@ local function OnAddonLoaded(event, name)
 end
 EVENT_MANAGER:RegisterForEvent(ADDON_NAME, EVENT_ADD_ON_LOADED, OnAddonLoaded)
 
--- #endregion COMMON CODE 02
+--#endregion
 
