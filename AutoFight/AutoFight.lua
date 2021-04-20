@@ -1,5 +1,6 @@
--- #region COMMON CODE 01
+--#region COMMON CODE 01
 
+--#region Constants
 local ADDON_NAME = "AutoFight"
 local GIDEON = "Gideon Godiva"
 local GALILEI = "Galilei Godiva"
@@ -15,8 +16,9 @@ local ANYA = "Anya Romaine"
 local MINA = "Mina Copperton"
 local KARRIE = "Karrie Lumin"
 local CROWN_TRI_POTION = "Crown Tri-Restoration Potion"
+--#endregion
 
--- #region start local copies
+--#region start local copies
 
 local VK1 = LibPixelControl.VK_1
 local VK2 = LibPixelControl.VK_2
@@ -167,7 +169,7 @@ end
 local function AutoFightShouldNotAct()
 	return (not IsUnitInCombat('player') or IsReticleHidden() or IsUnitSwimming('player') or IsUnitDead('player') or Mounted() or IHave("Bestial Transformation") or IHave("Skeevaton") or InteractName()=="Cage of Torment" or IsUnitBeingResurrected("reticleover"))
 end
--- #region Healer functions
+--#region Healer functions
 local function LowestGroupHealthPercent()
 	local GroupSize = GetGroupSize()
 	local LowestGroupHealthPercent = 1.00
@@ -245,7 +247,7 @@ end
 
 -- #endregion
 
--- #region Actions
+--#region Actions
 local function Press(key)
 	LibPixelControl.SetIndOnFor(key,50)
 end
@@ -319,7 +321,7 @@ end
 
 -- #endregion
 
--- #region Attack Begin Blocking
+--#region Attack Begin Blocking
 local ABB = { } -- Attack Begin Blocking, saved variable
 local IncomingAttackETA = 0
 local IncomingAttackETR = 0
@@ -394,7 +396,7 @@ local function ShouldBlock()
 end
 -- #endregion
 
--- #region Key Bindings
+--#region Key Bindings
 ZO_CreateStringId("SI_BINDING_NAME_InMeleeRange", "InMeleeRange")
 function KeyBindInMeleeRangeYes()
 	InMeleeRange = true
@@ -404,7 +406,7 @@ function KeyBindInMeleeRangeNo()
 end
 -- #endregion
 
--- #region AutoFight standard inserts
+--#region AutoFight standard inserts
 -- these are bits of logic that are common across all characters and need to be inserted at specific points (for example: after healing, but before attacking)
 
 local function TopPriorityAutoFight()
@@ -436,7 +438,7 @@ end
 
 -- #endregion COMMON CODE 01
 
--- #region CHARACTER-SPECIFIC CODE 01
+--#region CHARACTER-SPECIFIC CODE 01
 
 local BlockCostPerChar = {
 	[GIDEON] = 2020,
@@ -622,7 +624,7 @@ end
 
 -- #endregion CHARACTER-SPECIFIC CODE 01
 
--- #region COMMON CODE 02
+--#region COMMON CODE 02
 
 local function InitializeVariables()
 	BlockCost = BlockCostPerChar[CharName] or BlockCost
