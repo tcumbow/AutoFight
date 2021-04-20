@@ -1,5 +1,6 @@
--- #region COMMON CODE 01
+--#region COMMON CODE 01
 
+--#region Constants
 local ADDON_NAME = "AutoFight"
 local GIDEON = "Gideon Godiva"
 local GALILEI = "Galilei Godiva"
@@ -15,8 +16,9 @@ local ANYA = "Anya Romaine"
 local MINA = "Mina Copperton"
 local KARRIE = "Karrie Lumin"
 local CROWN_TRI_POTION = "Crown Tri-Restoration Potion"
+--#endregion
 
--- #region start local copies
+--#region Local copies
 
 local VK1 = LibPixelControl.VK_1
 local VK2 = LibPixelControl.VK_2
@@ -38,22 +40,26 @@ local Print = d
 
 local GetUnitName = GetUnitName
 
--- #endregion local copies
+--#endregion
 
-local CharName
-local BlockCost = 2160 -- default until overwritten by character-specific code
-local InMeleeRange = false
-local SynergyName
-local TargetName
-
+--#region Diagnostics
 local function Log(text)
 end
 
 function AutoFightEnableDiagnostics()
 	Log = Print
 end
+--#endregion
 
+--#region Info variables
+local CharName
+local BlockCost = 2160 -- default until overwritten by character-specific code
+local InMeleeRange = false
+local SynergyName
+local TargetName
+--#endregion
 
+--#region Common info functions
 local function Health()
 	local MyHealth, MyMaxHealth = GetUnitPower('player', POWERTYPE_HEALTH)
 	return ((MyHealth/MyMaxHealth)*100)
@@ -158,12 +164,6 @@ end
 local function TargetIsMoreThanTrash()
 	return (GetUnitDifficulty("reticleover") >= 2)
 end
-local function TargetCouldBeTaunted()
-	return (TargetIsHostileNpc() and not TargetHas("Taunt"))
-end
-local function TargetShouldBeTaunted()
-	return (TargetCouldBeTaunted() and (TargetIsBoss() or (Stamina()>50 and TargetIsMoreThanTrash()) or (Stamina()>90) ))
-end
 local function InteractVerb()
 	local action, _, _, _, _ = GetGameCameraInteractableActionInfo()
 	return action
@@ -172,10 +172,9 @@ local function InteractName()
 	local _, interactableName, _, _, _ = GetGameCameraInteractableActionInfo()
 	return interactableName
 end
-local function AutoFightShouldNotAct()
-	return (not IsUnitInCombat('player') or IsReticleHidden() or IsUnitSwimming('player') or IsUnitDead('player') or Mounted() or IHave("Bestial Transformation") or IHave("Skeevaton") or InteractName()=="Cage of Torment" or IsUnitBeingResurrected("reticleover"))
-end
--- #region Healer functions
+--#endregion
+
+--#region Healer functions
 local function LowestGroupHealthPercent()
 	local GroupSize = GetGroupSize()
 	local LowestGroupHealthPercent = 1.00
@@ -246,9 +245,23 @@ local function QuickslotIsReady()
 	end
 end
 
--- #endregion
+local function ActiveBar()
+	local barNum = GetActiveWeaponPairInfo()
+	return barNum
+end
 
--- #region Actions
+--#endregion
+
+--#region Tank functions
+local function TargetCouldBeTaunted()
+	return (TargetIsHostileNpc() and not TargetHas("Taunt"))
+end
+local function TargetShouldBeTaunted()
+	return (TargetCouldBeTaunted() and (TargetIsBoss() or (Stamina()>50 and TargetIsMoreThanTrash()) or (Stamina()>90) ))
+end
+--#endregion
+
+--#region Actions
 local function Press(key)
 	LibPixelControl.SetIndOnFor(key,50)
 end
@@ -331,9 +344,9 @@ local function DoNothing()
 	Log("DoNothing")
 end
 
--- #endregion
+--#endregion
 
--- #region Attack Begin Blocking
+--#region Attack Begin Blocking
 local ABB = { } -- Attack Begin Blocking, saved variable
 local IncomingAttackETA = 0
 local IncomingAttackETR = 0
@@ -406,9 +419,9 @@ end
 local function ShouldBlock()
 	return (AttackIncoming() and StaminaPoints()>BlockCost and (IncomingAttackIsNotBlockTested or (IncomingAttackPredictedDamage/HealthPoints())>(BlockCost/StaminaPoints())))
 end
--- #endregion
+--#endregion
 
--- #region Key Bindings
+--#region Key Bindings
 ZO_CreateStringId("SI_BINDING_NAME_InMeleeRange", "InMeleeRange")
 function KeyBindInMeleeRangeYes()
 	InMeleeRange = true
@@ -416,10 +429,13 @@ end
 function KeyBindInMeleeRangeNo()
 	InMeleeRange = false
 end
--- #endregion
+--#endregion
 
--- #region AutoFight standard inserts
+--#region AutoFight standard inserts
 -- these are bits of logic that are common across all characters and need to be inserted at specific points (for example: after healing, but before attacking)
+local function AutoFightShouldNotAct()
+	return (not IsUnitInCombat('player') or IsReticleHidden() or IsUnitSwimming('player') or IsUnitDead('player') or Mounted() or IHave("Bestial Transformation") or IHave("Skeevaton") or InteractName()=="Cage of Torment" or IsUnitBeingResurrected("reticleover"))
+end
 
 local function TopPriorityAutoFight()
 	SynergyName = GetSynergyInfo()
@@ -446,31 +462,16 @@ local function PreAttackAutoFight()
 	return true --signals to caller that this function did take an action and the caller function should not override that
 end
 
--- #endregion
+--#endregion
 
--- #endregion COMMON CODE 01
+--#endregion
 
--- #region CHARACTER-SPECIFIC CODE 01
+--#region CHARACTER-SPECIFIC CODE 01
 
-local BlockCostPerChar = {
-	[GIDEON] = 2020,
-	[GALILEI] = nil,
-	[DORIAN] = nil,
-	[GALILEI] = nil,
-	[HADARA] = nil,
-	[ELODIE] = 1943,
-	[FREYA] = nil,
-	[JERICAH] = 1120,
-	[NEVIRA] = nil,
-	[KRIN] = 1068,
-	[NISSA] = nil,
-	[ANYA] = nil,
-	[MINA] = nil,
-	[KARRIE] = 1619,
-}
-
+local BlockCostPerChar = {}
 local AutoFight = {}
 
+BlockCostPerChar[GIDEON] = 2020
 AutoFight[GIDEON] = function ()
 	if TopPriorityAutoFight() then
 	elseif Magicka()<15 and not Blocking() then HeavyAttack()
@@ -488,6 +489,7 @@ AutoFight[GIDEON] = function ()
 	end
 end
 
+BlockCostPerChar[DORIAN] = nil
 AutoFight[DORIAN] = function ()
 	if TopPriorityAutoFight() then
 	elseif Health() < 80 and Magicka() > 80 then WeaveAbility(4)
@@ -501,23 +503,28 @@ AutoFight[DORIAN] = function ()
 	end
 end
 
+BlockCostPerChar[JERICAH] = 1120
 AutoFight[JERICAH] = function ()
 	if TopPriorityAutoFight() then
 	elseif Health() < 40 and TargetIsHostileNpc() and MagickaPoints() > 3000 then UseAbility(4)
 	elseif Health() < 50 and TargetIsHostileNpc() and MagickaPoints() > 3000 then WeaveAbility(4)
 	elseif PreAttackAutoFight() then
 	elseif ShouldBlock() then Block()
-	elseif TargetShouldBeTaunted() and StaminaPoints()>1500 then WeaveAbility(2)
-	elseif not IHave("Major Resolve") and MagickaPoints()>2500 then WeaveAbility(3)
-	elseif not IHave("Minor Protection") and MagickaPoints()>4000 then WeaveAbility(5)
-	elseif TargetIsHostileNpc() and Stamina()>90 then WeaveAbility(1)
-	elseif TargetIsHostileNpc() and (not Blocking()) and (not BlockInProgress()) then HeavyAttack() -- do we really need BlockInProgress?
+	elseif TargetShouldBeTaunted() and ActiveBar()==1 and StaminaPoints()>1500 then WeaveAbility(2)
+	elseif ActiveBar()==2 and not IHave("Skeletal Archer") and StaminaPoints()>4000 then WeaveAbility(5)
+	elseif ActiveBar()==2 and not IHave("Blighted Blastbones") and StaminaPoints()>5000 then WeaveAbility(2)
+	elseif not IHave("Major Resolve") and ActiveBar()==1 and MagickaPoints()>2500 then WeaveAbility(3)
+	elseif not IHave("Minor Protection") and ActiveBar()==1 and MagickaPoints()>4000 then WeaveAbility(5)
 	elseif UltimateReady() and TargetIsHostileNpc() and TargetIsMoreThanTrash() then UseUltimate()
+	elseif TargetIsHostileNpc() and ActiveBar()==1 and Stamina()>90 then WeaveAbility(1)
+	elseif TargetIsHostileNpc() and ActiveBar()==2 and Stamina()>40 then WeaveAbility(1)
 	elseif TargetIsHostileNpc() and not Blocking() then HeavyAttack()
+	elseif not IHave("Major Resolve") and MagickaPoints()>2500 then WeaveAbility(3)
 	else DoNothing()
 	end
 end
 
+BlockCostPerChar[GALILEI] = nil
 AutoFight[GALILEI] = function ()
 	if TopPriorityAutoFight() then
 	elseif PreAttackAutoFight() then
@@ -531,6 +538,7 @@ AutoFight[GALILEI] = function ()
 	end
 end
 
+BlockCostPerChar[ELODIE] = 1943
 AutoFight[ELODIE] = function ()
 	if TopPriorityAutoFight() then
 	elseif PreAttackAutoFight() then
@@ -542,11 +550,12 @@ AutoFight[ELODIE] = function ()
 	end
 end
 
+BlockCostPerChar[HADARA] = 2012
 AutoFight[HADARA] = function ()
 	if TopPriorityAutoFight() then
 	elseif PreAttackAutoFight() then
 	elseif ShouldBlock() then Block()
-	elseif Magicka()<15 and not Blocking() then HeavyAttack()
+	elseif Magicka() < 20 then HeavyAttack()
 	elseif not IHave("Summon Twilight Matriarch") then UseAbility(4)
 	elseif LowestGroupHealthPercent()<40 then UseAbility(4)
 	elseif not IHave("Summon Volatile Familiar") then WeaveAbility(2)
@@ -558,6 +567,7 @@ AutoFight[HADARA] = function ()
 	end
 end
 
+BlockCostPerChar[FREYA] = nil
 AutoFight[FREYA] = function ()
 	if TopPriorityAutoFight() then
 	elseif Health() < 60 and StaminaPoints() > 4000 then UseAbility(4)
@@ -572,6 +582,7 @@ AutoFight[FREYA] = function ()
 	end
 end
 
+BlockCostPerChar[KARRIE] = 1619
 AutoFight[KARRIE] = function ()
 	if TopPriorityAutoFight() then
 	elseif PreAttackAutoFight() then
@@ -584,6 +595,7 @@ AutoFight[KARRIE] = function ()
 	end
 end
 
+BlockCostPerChar[MINA] = nil
 AutoFight[MINA] = function ()
 	if TopPriorityAutoFight() then
 	elseif Health() < 50 and MagickaPoints() > 4000 then UseAbility(5)
@@ -596,6 +608,7 @@ AutoFight[MINA] = function ()
 	end
 end
 
+BlockCostPerChar[ANYA] = nil
 AutoFight[ANYA] = function ()
 	if TopPriorityAutoFight() then
 	elseif PreAttackAutoFight() then
@@ -607,6 +620,7 @@ AutoFight[ANYA] = function ()
 	end
 end
 
+BlockCostPerChar[KRIN] = 1068
 AutoFight[KRIN] = function ()
 	if TopPriorityAutoFight() then
 	elseif PreAttackAutoFight() then
@@ -620,6 +634,7 @@ AutoFight[KRIN] = function ()
 	end
 end
 
+BlockCostPerChar["TEMPLATE"] = nil
 AutoFight["TEMPLATE"] = function ()
 	if TopPriorityAutoFight() then
 	elseif Health() < 80 then UseAbility(1)
@@ -631,9 +646,9 @@ AutoFight["TEMPLATE"] = function ()
 	end
 end
 
--- #endregion CHARACTER-SPECIFIC CODE 01
+--#endregion
 
--- #region COMMON CODE 02
+--#region COMMON CODE 02
 
 local function InitializeVariables()
 	BlockCost = BlockCostPerChar[CharName] or BlockCost
@@ -656,5 +671,5 @@ local function OnAddonLoaded(event, name)
 end
 EVENT_MANAGER:RegisterForEvent(ADDON_NAME, EVENT_ADD_ON_LOADED, OnAddonLoaded)
 
--- #endregion COMMON CODE 02
+--#endregion
 
