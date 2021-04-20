@@ -438,7 +438,7 @@ local BlockCostPerChar = {
 	[GALILEI] = nil,
 	[DORIAN] = nil,
 	[GALILEI] = nil,
-	[HADARA] = nil,
+	[HADARA] = 2012,
 	[ELODIE] = 1943,
 	[FREYA] = nil,
 	[JERICAH] = 1120,
@@ -527,7 +527,7 @@ AutoFight[HADARA] = function ()
 	if TopPriorityAutoFight() then
 	elseif PreAttackAutoFight() then
 	elseif ShouldBlock() then Block()
-	elseif Magicka()<15 and not Blocking() then HeavyAttack()
+	elseif Magicka() < 20 then HeavyAttack()
 	elseif not IHave("Summon Twilight Matriarch") then UseAbility(4)
 	elseif LowestGroupHealthPercent()<40 then UseAbility(4)
 	elseif not IHave("Summon Volatile Familiar") then WeaveAbility(2)
