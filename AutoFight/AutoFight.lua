@@ -412,10 +412,10 @@ end
 --#endregion
 
 --#region AutoFight standard inserts
--- these are bits of logic that are common across all characters and need to be inserted at specific points (for example: after healing, but before attacking)
 local function AutoFightShouldNotAct()
 	return (not IsUnitInCombat('player') or IsReticleHidden() or IsUnitSwimming('player') or IsUnitDead('player') or Mounted() or IHave("Bestial Transformation") or IHave("Skeevaton") or InteractName()=="Cage of Torment" or IsUnitBeingResurrected("reticleover"))
 end
+-- these are bits of logic that are common across all characters and need to be inserted at specific points (for example: after healing, but before attacking)
 
 local function TopPriorityAutoFight()
 	SynergyName = GetSynergyInfo()
