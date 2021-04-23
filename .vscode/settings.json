@@ -92,7 +92,9 @@
         "DoSpecialAction",
         "GetSynergyInfo",
         "IsUnitBeingResurrected",
-        "DoesUnitHaveResurrectPending"
+        "DoesUnitHaveResurrectPending",
+        "IsWerewolf",
+        "POWERTYPE_WEREWOLF"
     ],
     "cSpell.words": [
         "ANYA",

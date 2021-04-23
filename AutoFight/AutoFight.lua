@@ -38,6 +38,7 @@ local Blocking = IsBlockActive
 local Now = GetGameTimeMilliseconds
 local Mounted = IsMounted
 local Print = d
+local Werewolf = IsWerewolf
 
 local GetUnitName = GetUnitName
 
@@ -79,6 +80,10 @@ end
 local function UltimateReady()
 	local MyUltimate, _ = GetUnitPower('player', POWERTYPE_ULTIMATE)
 	return (MyUltimate >= GetAbilityCost(GetSlotBoundId(8)))
+end
+local function WerewolfPowerPct()
+	local current, max, effectiveMax = GetUnitPower('player', POWERTYPE_WEREWOLF)
+	return ((current/max)*100)
 end
 local function QuickslotName()
 	return GetSlotName(GetCurrentQuickslot())
