@@ -30,6 +30,7 @@ local VKQ = LibPixelControl.VK_Q
 local VKR = LibPixelControl.VK_R
 local VKX = LibPixelControl.VK_X
 local VKF9 = LibPixelControl.VK_F9
+local VKF10 = LibPixelControl.VK_F10
 local VMLeft = LibPixelControl.VM_BTN_LEFT
 local VMRight = LibPixelControl.VM_BTN_RIGHT
 
@@ -279,6 +280,11 @@ local function EndHeavyAttack()
 end
 local function HeavyAttackInProgress()
 	return (WeAreHolding[VMLeft])
+end
+local function RollDodge()
+	EndBlock()
+	EndHeavyAttack()
+	Press(VKF10)
 end
 local function LightAttack()
 	EndBlock()
