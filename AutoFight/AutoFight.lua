@@ -246,7 +246,7 @@ end
 
  --#region Tank functions
 local function TargetCouldBeTaunted()
-	return (TargetIsHostileNpc() and not TargetHas("Taunt"))
+	return (TargetIsHostileNpc() and not UnitHasBuffTimeLeft("reticleover","Taunt",2000))
 end
 local function TargetShouldBeTaunted()
 	return (TargetCouldBeTaunted() and (TargetIsBoss() or (Stamina()>50 and TargetIsMoreThanTrash()) or (Stamina()>90) ))
