@@ -477,6 +477,7 @@ local function PreAttackAutoFight()
 	elseif SynergyName == "Combustion" then DoSynergy()
 	elseif TargetName == "Plane Meld Rift" then LightAttack()
 	elseif (Health() < 50 or Magicka() < 15 or Stamina() < 15) and QuickslotName() == CROWN_TRI_POTION and QuickslotIsReady() then DoQuickslot()
+	elseif ShouldBlock() then Block()
 	elseif ShouldRollDodge() then RollDodge()
 	else return false --signals to the caller that this function did NOT take an action; the caller function will continue down its elseif sequence
 	end
@@ -499,7 +500,6 @@ AutoFight[GIDEON] = function ()
 	elseif LowestGroupHealthPercent()<40 then UseAbility(1)
 	elseif LowestGroupHealthPercent()<70 and Magicka()>70 then UseAbility(1)
 	elseif LowestGroupHealthPercentWithoutRegen()<80 then UseAbility(2)
-	elseif ShouldBlock() then Block()
 	elseif PreAttackAutoFight() then
 	-- elseif UltimateReady() and TargetIsHostileNpc() then UseUltimate()
 	elseif LowestGroupHealthPercentWithoutRegen()<90 then WeaveAbility(2)
@@ -517,7 +517,6 @@ AutoFight[DORIAN] = function ()
 	elseif Health() < 60 and Magicka() > 40 then UseAbility(4)
 	elseif Health() < 40 and Magicka() > 25 then UseAbility(4)
 	elseif PreAttackAutoFight() then
-	elseif ShouldBlock() then Block()
 	elseif UltimateReady() then UseUltimate()
 	elseif TargetIsHostileNpc() and not Blocking() then HeavyAttack()
 	else DoNothing()
@@ -530,7 +529,6 @@ AutoFight[JERICAH] = function ()
 	elseif Health() < 40 and TargetIsHostileNpc() and MagickaPoints() > 3000 then UseAbility(4)
 	elseif Health() < 50 and TargetIsHostileNpc() and MagickaPoints() > 3000 then WeaveAbility(4)
 	elseif PreAttackAutoFight() then
-	elseif ShouldBlock() then Block()
 	elseif TargetShouldBeTaunted() and ActiveBar()==1 and StaminaPoints()>1500 then WeaveAbility(2)
 	elseif ActiveBar()==2 and not IHave("Skeletal Archer") and StaminaPoints()>4000 then WeaveAbility(5)
 	elseif ActiveBar()==2 and not IHave("Blighted Blastbones") and StaminaPoints()>5000 then WeaveAbility(2)
@@ -549,7 +547,6 @@ BlockCostPerChar[GALILEI] = nil
 AutoFight[GALILEI] = function ()
 	if TopPriorityAutoFight() then
 	elseif PreAttackAutoFight() then
-	elseif ShouldBlock() then Block()
 	elseif Health() < 60 then WeaveAbility(4)
 	elseif UltimateReady() and TargetIsHostileNpc() and TargetIsMoreThanTrash() then UseUltimate()
 	elseif TargetIsHostileNpc() and not TargetHas("Minor Vulnerability") and Magicka() > 25 then WeaveAbility(3)
@@ -563,7 +560,6 @@ BlockCostPerChar[ELODIE] = 1943
 AutoFight[ELODIE] = function ()
 	if TopPriorityAutoFight() then
 	elseif PreAttackAutoFight() then
-	elseif ShouldBlock() then Block()
 	elseif UltimateReady() and TargetIsHostileNpc() and TargetIsMoreThanTrash() then UseUltimate()
 	elseif TargetIsHostileNpc() and Magicka()>15 then WeaveAbility(1)
 	elseif not Blocking() then HeavyAttack()
@@ -575,7 +571,6 @@ BlockCostPerChar[HADARA] = 2012
 AutoFight[HADARA] = function ()
 	if TopPriorityAutoFight() then
 	elseif PreAttackAutoFight() then
-	elseif ShouldBlock() then Block()
 	elseif Magicka() < 20 then HeavyAttack()
 	elseif not IHave("Summon Twilight Matriarch") then UseAbility(4)
 	elseif LowestGroupHealthPercent()<40 then UseAbility(4)
@@ -593,7 +588,6 @@ AutoFight[FREYA] = function ()
 	if TopPriorityAutoFight() then
 	elseif Health() < 60 and StaminaPoints() > 4000 then UseAbility(4)
 	elseif PreAttackAutoFight() then
-	elseif ShouldBlock() then Block()
 	elseif UltimateReady() and TargetIsHostileNpc() and TargetIsMoreThanTrash() then UseUltimate()
 	elseif not IHave("Molten Armaments") and MagickaPoints() > 10000 and TargetIsHostileNpc() then WeaveAbility(3)
 	elseif not IHave("Flames of Oblivion") and MagickaPoints() > 10000 and TargetIsHostileNpc() then WeaveAbility(5)
@@ -607,7 +601,6 @@ BlockCostPerChar[KARRIE] = 1619
 AutoFight[KARRIE] = function ()
 	if TopPriorityAutoFight() then
 	elseif PreAttackAutoFight() then
-	elseif ShouldBlock() then Block()
 	elseif UltimateReady() and TargetIsHostileNpc() and TargetIsMoreThanTrash() then UseUltimate()
 	elseif Health() < 60 and not IHave("Leeching Strikes") then WeaveAbility(5)
 	elseif TargetIsHostileNpc() and not Blocking() and Stamina() > 50 then LightAttack()
@@ -621,7 +614,6 @@ AutoFight[MINA] = function ()
 	if TopPriorityAutoFight() then
 	elseif Health() < 50 and MagickaPoints() > 4000 then UseAbility(5)
 	elseif PreAttackAutoFight() then
-	elseif ShouldBlock() then Block()
 	elseif UltimateReady() and TargetIsHostileNpc() and TargetIsMoreThanTrash() then UseUltimate()
 	elseif InMeleeRange and Magicka() > 20 then WeaveAbility(1)
 	elseif TargetIsHostileNpc() and not Blocking() then HeavyAttack()
@@ -633,7 +625,6 @@ BlockCostPerChar[ANYA] = nil
 AutoFight[ANYA] = function ()
 	if TopPriorityAutoFight() then
 	elseif PreAttackAutoFight() then
-	elseif ShouldBlock() then Block()
 	elseif UltimateReady() and TargetIsHostileNpc() and TargetIsMoreThanTrash() then UseUltimate()
 	elseif not IHave("Skeletal Archer") and Stamina() > 50 then WeaveAbility(4)
 	elseif TargetIsHostileNpc() and not Blocking() then HeavyAttack()
@@ -645,7 +636,6 @@ BlockCostPerChar[KRIN] = 1068
 AutoFight[KRIN] = function ()
 	if TopPriorityAutoFight() then
 	elseif PreAttackAutoFight() then
-	elseif ShouldBlock() then Block()
 	elseif TargetShouldBeTaunted() then WeaveAbility(4)
 	elseif UltimateReady() and TargetIsHostileNpc() and TargetIsMoreThanTrash() then UseUltimate()
 	-- elseif not IHave("Summon Unstable Clannfear") then WeaveAbility(5)
@@ -660,7 +650,6 @@ AutoFight[NISSA] = function ()
 	if TopPriorityAutoFight() then
 	elseif Health()<60 and not IHave("Resolving Vigor") and StaminaPoints()>3000 then WeaveAbility(4)
 	elseif PreAttackAutoFight() then
-	elseif ShouldBlock() then Block()
 	elseif UltimateReady() and TargetIsHostileNpc() and TargetIsMoreThanTrash() then UseUltimate()
 	elseif Stamina()<60 then HeavyAttack()
 	elseif TargetIsHostileNpc() and not TargetHas("Poison Injection") then WeaveAbility(2)
@@ -675,7 +664,6 @@ AutoFight["TEMPLATE"] = function ()
 	if TopPriorityAutoFight() then
 	elseif Health() < 80 then UseAbility(1)
 	elseif PreAttackAutoFight() then
-	elseif ShouldBlock() then Block()
 	elseif UltimateReady() and TargetIsHostileNpc() and TargetIsMoreThanTrash() then UseUltimate()
 	elseif TargetIsHostileNpc() and not Blocking() then HeavyAttack()
 	else DoNothing()
