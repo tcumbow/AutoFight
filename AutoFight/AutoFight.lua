@@ -464,6 +464,7 @@ local function TopPriorityAutoFight()
 	elseif Stunned then BreakFree()
 	elseif SynergyName == "Flesh Grenade" and TargetName == "Inmate" then DoSynergy()
 	elseif InteractName() == "Daedric Alter" then DoInteract()
+	elseif MustRollDodge() then RollDodge()
 	else return false --signals to the caller that this function did NOT take an action; the caller function will continue down its elseif sequence
 	end
 	return true --signals to caller that this function did take an action and the caller function should not override that
@@ -476,6 +477,7 @@ local function PreAttackAutoFight()
 	elseif SynergyName == "Combustion" then DoSynergy()
 	elseif TargetName == "Plane Meld Rift" then LightAttack()
 	elseif (Health() < 50 or Magicka() < 15 or Stamina() < 15) and QuickslotName() == CROWN_TRI_POTION and QuickslotIsReady() then DoQuickslot()
+	elseif ShouldRollDodge() then RollDodge()
 	else return false --signals to the caller that this function did NOT take an action; the caller function will continue down its elseif sequence
 	end
 	return true --signals to caller that this function did take an action and the caller function should not override that
@@ -497,7 +499,6 @@ AutoFight[GIDEON] = function ()
 	elseif LowestGroupHealthPercent()<40 then UseAbility(1)
 	elseif LowestGroupHealthPercent()<70 and Magicka()>70 then UseAbility(1)
 	elseif LowestGroupHealthPercentWithoutRegen()<80 then UseAbility(2)
-	elseif ShouldRollDodge() then RollDodge()
 	elseif ShouldBlock() then Block()
 	elseif PreAttackAutoFight() then
 	-- elseif UltimateReady() and TargetIsHostileNpc() then UseUltimate()
