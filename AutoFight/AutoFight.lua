@@ -423,7 +423,7 @@ local function ShouldBlock()
 end
 local function ShouldRollDodge()
 	local worstIncomingAttack = WorstIncomingAttack()
-	if worstIncomingAttack == nil then return end
+	if worstIncomingAttack == nil then return false end
 	local predictedDamage = ABB.MaxRecordedDamagePerAbilitySynId[worstIncomingAttack.AbilitySynId]
 	return (StaminaPoints()>RollDodgeCost() and (predictedDamage/HealthPoints())>0.90)
 end
