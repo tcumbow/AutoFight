@@ -81,9 +81,6 @@ local function UltimateReady()
 	local MyUltimate, _ = GetUnitPower('player', POWERTYPE_ULTIMATE)
 	return (MyUltimate >= GetAbilityCost(GetSlotBoundId(8)))
 end
-local function RollDodgeCost()
-	return 3654
-end
 local function QuickslotName()
 	return GetSlotName(GetCurrentQuickslot())
 end
@@ -150,6 +147,10 @@ local function IHaveId(buffId)
 		end
 	end
 	return false
+end
+local function RollDodgeCost()
+	if IHave("Dodge Fatigue") then return 4872
+	else return 3654 end
 end
 local function VolatilePulseReady()
 	return (IHave("Summon Volatile Familiar") and not IHaveId(88933))
