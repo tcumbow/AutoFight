@@ -80,6 +80,9 @@ local function UltimateReady()
 	local MyUltimate, _ = GetUnitPower('player', POWERTYPE_ULTIMATE)
 	return (MyUltimate >= GetAbilityCost(GetSlotBoundId(8)))
 end
+local function RollDodgeCost()
+	return 3654
+end
 local function QuickslotName()
 	return GetSlotName(GetCurrentQuickslot())
 end
@@ -334,13 +337,7 @@ end
 
 --#region Attack Begin Blocking
 local ABB = { } -- Attack Begin Blocking, saved variable
-local IncomingAttackETA = 0
-local IncomingAttackETR = 0
-local IncomingAttackPredictedDamage = 1
-local IncomingAttackAbilitySynId = 0
-local IncomingAttackIsNotBlockTested = false
-local IncomingAttackSourceUnitId = 0
-local IncomingAttackBeginTimestamp = 0
+local IncomingAttacksBySourceUnitId = { }
 local LAG_THAT_IS_TOO_QUICK_TO_BLOCK = 120
 local BLOCK_TEST_THRESHOLD = 5
 local function InitializeABBDataStructures()
@@ -350,50 +347,65 @@ local function InitializeABBDataStructures()
 	ABB.CanBeBlockedPerAbilitySynId = ABB.CanBeBlockedPerAbilitySynId or { }
 	ABB.BlockTestsPerAbilitySynId = ABB.BlockTestsPerAbilitySynId or { }
 end
-local function AttackIncoming()
-	return (IncomingAttackETA-300<Now() and IncomingAttackETR+300>Now())
+local function CleanIncomingAttacksTable()
+	for key, value in pairs(IncomingAttacksBySourceUnitId) do
+		if value.Timestamp > Now() + 5000 then IncomingAttacksBySourceUnitId[key] = nil end	
+	end
+end
+local function IncomingAttackIsAboutToHit(attack)
+	local minRecordedLag = ABB.MinRecordedLagPerAbilitySynId[attack.AbilitySynId]
+	if minRecordedLag == nil or minRecordedLag < LAG_THAT_IS_TOO_QUICK_TO_BLOCK then return false end
+	local maxRecordedLag = ABB.MaxRecordedLagPerAbilitySynId[attack.AbilitySynId]
+	if maxRecordedLag == nil then return false end
+	local now = Now()
+	local incomingAttackETA = now + minRecordedLag
+	local incomingAttackETR = now + maxRecordedLag
+	return (incomingAttackETA-300 < now and incomingAttackETR+300 > now)
+end
+local THAT_IS_BLOCKABLE = 1
+local function WorstIncomingAttack(mustBeBlockable)
+	local keyOfWorstAttack
+	local biggestDamage = -1
+	for key, value in pairs(IncomingAttacksBySourceUnitId) do
+		local damageBeingExamined = ABB.MaxRecordedDamagePerAbilitySynId[value.AbilitySynId] or 0
+		if damageBeingExamined > biggestDamage and IncomingAttackIsAboutToHit(value) and (mustBeBlockable == nil or ABB.CanBeBlockedPerAbilitySynId[value.AbilitySynId] == true) then
+			keyOfWorstAttack = key
+			biggestDamage = damageBeingExamined
+		end
+	end
+	if keyOfWorstAttack == nil then return nil
+	else return IncomingAttacksBySourceUnitId[keyOfWorstAttack]
+	end
 end
 local function OnEventCombatEvent( eventCode, result, isError, abilityName, abilityGraphic, abilityActionSlotType, sourceName, sourceType, targetName, targetType, hitValue, powerType, damageType, log, sourceUnitId, targetUnitId, abilityId )
 	local abilitySynId = sourceName.." "..abilityName
 	if targetType==COMBAT_UNIT_TYPE_PLAYER and sourceType~=COMBAT_UNIT_TYPE_PLAYER then
+		local now = Now()
 		if result==ACTION_RESULT_BEGIN then
-			if (ABB.CanBeBlockedPerAbilitySynId[abilitySynId] or nil==ABB.BlockTestsPerAbilitySynId[abilitySynId] or ABB.BlockTestsPerAbilitySynId[abilitySynId]<BLOCK_TEST_THRESHOLD) then
-				if (nil==ABB.MinRecordedLagPerAbilitySynId[abilitySynId] or ABB.MinRecordedLagPerAbilitySynId[abilitySynId] > LAG_THAT_IS_TOO_QUICK_TO_BLOCK) then
-					if ((not AttackIncoming()) or (abilitySynId~=IncomingAttackAbilitySynId and nil~=ABB.MaxRecordedDamagePerAbilitySynId[abilitySynId] and IncomingAttackPredictedDamage < ABB.MaxRecordedDamagePerAbilitySynId[abilitySynId])) then
-						IncomingAttackBeginTimestamp = Now()
-						if nil~=ABB.MinRecordedLagPerAbilitySynId[abilitySynId] then IncomingAttackETA = Now()+ABB.MinRecordedLagPerAbilitySynId[abilitySynId]
-						else IncomingAttackETA = Now() end
-						if nil~=ABB.MaxRecordedLagPerAbilitySynId[abilitySynId] then IncomingAttackETR = Now()+ABB.MaxRecordedLagPerAbilitySynId[abilitySynId]
-						else IncomingAttackETR = Now()+5000 end -- max duration assumption
-						if nil~=ABB.MaxRecordedDamagePerAbilitySynId[abilitySynId] then IncomingAttackPredictedDamage = ABB.MaxRecordedDamagePerAbilitySynId[abilitySynId]
-						else IncomingAttackPredictedDamage = 1 end
-						IncomingAttackAbilitySynId = abilitySynId
-						IncomingAttackSourceUnitId = sourceUnitId
-						IncomingAttackIsNotBlockTested = ((ABB.CanBeBlockedPerAbilitySynId[abilitySynId]~=true) and (nil==ABB.BlockTestsPerAbilitySynId[abilitySynId] or ABB.BlockTestsPerAbilitySynId[abilitySynId]<BLOCK_TEST_THRESHOLD))
-						if nil==ABB.BlockTestsPerAbilitySynId[abilitySynId] then ABB.BlockTestsPerAbilitySynId[abilitySynId] = 1
-						else ABB.BlockTestsPerAbilitySynId[abilitySynId] = ABB.BlockTestsPerAbilitySynId[abilitySynId] + 1 end
-					end
-				else
-					-- d("too fast: "..abilitySynId.." "..ABB.MinRecordedLagPerAbilitySynId[abilitySynId])
-				end
-			else
-				-- d("can't be blocked: "..abilitySynId)
-			end
+			IncomingAttacksBySourceUnitId[sourceUnitId] = {
+				AbilityId = abilityId,
+				AbilityName = abilityName,
+				SourceName = sourceName,
+				AbilitySynId = abilitySynId,
+				Timestamp = now }
 		elseif result==ACTION_RESULT_DAMAGE or result==ACTION_RESULT_BLOCKED_DAMAGE then
-			if (IncomingAttackETR+500>Now() and IncomingAttackSourceUnitId==sourceUnitId and IncomingAttackAbilitySynId==abilitySynId) then
-				local Lag = Now()-IncomingAttackBeginTimestamp
+			local correspondingIncomingAttack = IncomingAttacksBySourceUnitId[sourceUnitId]
+			if (correspondingIncomingAttack ~= nil and correspondingIncomingAttack.AbilitySynId==abilitySynId) then
+				local Lag = (now - correspondingIncomingAttack.Timestamp)
 				if nil==ABB.MinRecordedLagPerAbilitySynId[abilitySynId] or ABB.MinRecordedLagPerAbilitySynId[abilitySynId]>Lag then ABB.MinRecordedLagPerAbilitySynId[abilitySynId]=Lag end
 				if nil==ABB.MaxRecordedLagPerAbilitySynId[abilitySynId] or ABB.MaxRecordedLagPerAbilitySynId[abilitySynId]<Lag then ABB.MaxRecordedLagPerAbilitySynId[abilitySynId]=Lag end
-				IncomingAttackETR = 0
+				IncomingAttacksBySourceUnitId[sourceUnitId] = nil
 			end
-		end
-		if result==ACTION_RESULT_DAMAGE then
-			if ABB.MaxRecordedDamagePerAbilitySynId[abilitySynId]==nil or hitValue > ABB.MaxRecordedDamagePerAbilitySynId[abilitySynId] then ABB.MaxRecordedDamagePerAbilitySynId[abilitySynId] = hitValue end
-		elseif result==ACTION_RESULT_BLOCKED_DAMAGE then
-			-- d("blocked: "..abilitySynId)
-			if ABB.CanBeBlockedPerAbilitySynId[abilitySynId] ~= true then
-				ABB.CanBeBlockedPerAbilitySynId[abilitySynId] = true
-				d("AutoFight: learned to block: "..abilitySynId)
+			if result==ACTION_RESULT_DAMAGE then
+				if ABB.MaxRecordedDamagePerAbilitySynId[abilitySynId]==nil or hitValue > ABB.MaxRecordedDamagePerAbilitySynId[abilitySynId] then
+					ABB.MaxRecordedDamagePerAbilitySynId[abilitySynId] = hitValue
+					Print("AutoFight: new max damage recorded for: "..abilitySynId)
+				end
+			elseif result==ACTION_RESULT_BLOCKED_DAMAGE then
+				if ABB.CanBeBlockedPerAbilitySynId[abilitySynId] ~= true then
+					ABB.CanBeBlockedPerAbilitySynId[abilitySynId] = true
+					d("AutoFight: learned to block: "..abilitySynId)
+				end
 			end
 		end
 	end
@@ -403,7 +415,17 @@ local function OnEventStunStateChanged(_,StunState)
 	Stunned = StunState
 end
 local function ShouldBlock()
-	return (AttackIncoming() and StaminaPoints()>BlockCost and (IncomingAttackIsNotBlockTested or (IncomingAttackPredictedDamage/HealthPoints())>(BlockCost/StaminaPoints())))
+	local worstIncomingAttack = WorstIncomingAttack(THAT_IS_BLOCKABLE)
+	if worstIncomingAttack == nil then return false end
+	if not (ABB.CanBeBlockedPerAbilitySynId[worstIncomingAttack.AbilitySynId] == true) then return false end
+	local predictedDamage = ABB.MaxRecordedDamagePerAbilitySynId[worstIncomingAttack.AbilitySynId]
+	return (StaminaPoints()>BlockCost and (predictedDamage/HealthPoints())>(BlockCost/StaminaPoints()))
+end
+local function ShouldRollDodge()
+	local worstIncomingAttack = WorstIncomingAttack()
+	if worstIncomingAttack == nil then return end
+	local predictedDamage = ABB.MaxRecordedDamagePerAbilitySynId[worstIncomingAttack.AbilitySynId]
+	return (StaminaPoints()>RollDodgeCost() and (predictedDamage/HealthPoints())>0.90)
 end
 --#endregion
 
@@ -466,6 +488,7 @@ AutoFight[GIDEON] = function ()
 	elseif LowestGroupHealthPercent()<40 then UseAbility(1)
 	elseif LowestGroupHealthPercent()<70 and Magicka()>70 then UseAbility(1)
 	elseif LowestGroupHealthPercentWithoutRegen()<80 then UseAbility(2)
+	elseif ShouldRollDodge() then RollDodge()
 	elseif ShouldBlock() then Block()
 	elseif PreAttackAutoFight() then
 	-- elseif UltimateReady() and TargetIsHostileNpc() then UseUltimate()
