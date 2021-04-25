@@ -445,7 +445,8 @@ end
 
 local function PreAttackAutoFight()
 	if TargetName == "Inmate" or SynergyName == "Flesh Grenade" then DoNothing()
-	elseif TargetName=="Lightning Aspect" then DoNothing()
+	elseif TargetName == "Lightning Aspect" then DoNothing()
+	elseif TargetName == "Argonian Wranglers" then DoNothing()
 	elseif SynergyName == "Gravity Crush" then DoSynergy()
 	elseif SynergyName == "Combustion" then DoSynergy()
 	elseif TargetName == "Plane Meld Rift" then LightAttack()
