@@ -563,14 +563,18 @@ end
 
 BlockCostPerChar[FREYA] = nil
 AutoFight[FREYA] = function ()
-	if TopPriorityAutoFight() then
+	SynergyName = GetSynergyInfo()
+	if SynergyName == "Devour" and Werewolf() and WerewolfPowerPct() < 80 then DoSynergy()
+	elseif Werewolf() and WerewolfPowerPct() < 60 and Stamina() > 40 and Health() > 50 and DoesUnitExist('reticleover') and not IsUnitDead('reticleover') and GetUnitType('reticleover') ~= 1 and GetUnitReaction('reticleover') == UNIT_REACTION_HOSTILE then WeaveAbility(3)
+	elseif TopPriorityAutoFight() then
 	elseif Health() < 60 and StaminaPoints() > 4000 then UseAbility(4)
 	elseif PreAttackAutoFight() then
 	elseif ShouldBlock() then Block()
-	elseif UltimateReady() and TargetIsHostileNpc() and TargetIsMoreThanTrash() then UseUltimate()
-	elseif not IHave("Molten Armaments") and MagickaPoints() > 10000 and TargetIsHostileNpc() then WeaveAbility(3)
-	elseif not IHave("Flames of Oblivion") and MagickaPoints() > 10000 and TargetIsHostileNpc() then WeaveAbility(5)
-	elseif TargetIsHostileNpc() and StaminaPoints() > 10000 then WeaveAbility(1)
+	elseif UltimateReady() and not Werewolf() and TargetIsHostileNpc() and TargetIsMoreThanTrash() then UseUltimate()
+	elseif not Werewolf() and not IHave("Molten Armaments") and MagickaPoints() > 10000 and TargetIsHostileNpc() then WeaveAbility(3)
+	elseif not Werewolf() and not IHave("Flames of Oblivion") and MagickaPoints() > 10000 and TargetIsHostileNpc() then WeaveAbility(5)
+	elseif not Werewolf() and TargetIsHostileNpc() and StaminaPoints() > 10000 then WeaveAbility(1)
+	elseif Werewolf() and TargetIsHostileNpc() and not Blocking() and Stamina() > 70 then LightAttack()
 	elseif TargetIsHostileNpc() and not Blocking() then HeavyAttack()
 	else DoNothing()
 	end
@@ -681,4 +685,3 @@ end
 EVENT_MANAGER:RegisterForEvent(ADDON_NAME, EVENT_ADD_ON_LOADED, OnAddonLoaded)
 
 --#endregion
-
