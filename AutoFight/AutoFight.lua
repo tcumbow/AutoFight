@@ -358,8 +358,8 @@ local function IncomingAttackIsAboutToHit(attack)
 	local maxRecordedLag = ABB.MaxRecordedLagPerAbilitySynId[attack.AbilitySynId]
 	if maxRecordedLag == nil then return false end
 	local now = Now()
-	local incomingAttackETA = now + minRecordedLag
-	local incomingAttackETR = now + maxRecordedLag
+	local incomingAttackETA = attack.Timestamp + minRecordedLag
+	local incomingAttackETR = attack.Timestamp + maxRecordedLag
 	return (incomingAttackETA-300 < now and incomingAttackETR+300 > now)
 end
 local THAT_IS_BLOCKABLE = 1
