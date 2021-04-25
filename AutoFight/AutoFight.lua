@@ -487,7 +487,7 @@ local function PreAttackAutoFight()
 	elseif TargetName == "Plane Meld Rift" then LightAttack()
 	elseif (Health() < 50 or Magicka() < 40 or Stamina() < 50) and QuickslotName() == CROWN_TRI_POTION and QuickslotIsReady() then DoQuickslot()
 	elseif ShouldBlock() then Block()
-	elseif ShouldRollDodge() then RollDodge()
+	elseif not Blocking() and ShouldRollDodge() then RollDodge()
 	else return false --signals to the caller that this function did NOT take an action; the caller function will continue down its elseif sequence
 	end
 	return true --signals to caller that this function did take an action and the caller function should not override that
