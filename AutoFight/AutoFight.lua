@@ -46,6 +46,7 @@ local GetUnitName = GetUnitName
 --#region Info variables
 local CharName
 local BlockCost = 2160 -- default until overwritten by character-specific code
+local BlockMitigation = 0.50 -- default until overwritten by character-specific code
 local InMeleeRange = false
 local SynergyName
 local TargetName
@@ -419,7 +420,7 @@ local function ShouldBlock()
 	if worstIncomingAttack == nil then return false end
 	if not (ABB.CanBeBlockedPerAbilitySynId[worstIncomingAttack.AbilitySynId] == true) then return false end
 	local predictedDamage = ABB.MaxRecordedDamagePerAbilitySynId[worstIncomingAttack.AbilitySynId]
-	return (StaminaPoints()>BlockCost and (predictedDamage/HealthPoints())>(BlockCost/StaminaPoints()))
+	return (StaminaPoints()>BlockCost and ((predictedDamage*BlockMitigation)/HealthPoints())>(BlockCost/StaminaPoints()))
 end
 local function ShouldRollDodge()
 	local worstIncomingAttack = WorstIncomingAttack()
