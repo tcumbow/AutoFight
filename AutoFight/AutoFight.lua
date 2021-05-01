@@ -625,12 +625,12 @@ AutoFight[KARRIE] = function ()
 	end
 end
 
-BlockCostPerChar[MINA] = nil
+BlockCostPerChar[MINA] = 1670
 AutoFight[MINA] = function ()
 	if TopPriorityAutoFight() then
-	elseif Health() < 50 and MagickaPoints() > 4000 then UseAbility(5)
 	elseif PreAttackAutoFight() then
-	elseif UltimateReady() and TargetIsHostileNpc() and TargetIsMoreThanTrash() then UseUltimate()
+	elseif TargetShouldBeTaunted() then WeaveAbility(2)
+	elseif UltimateReady() and TargetIsHostileNpc() and InMeleeRange then UseUltimate()
 	elseif InMeleeRange and Magicka() > 20 then WeaveAbility(1)
 	elseif TargetIsHostileNpc() and not Blocking() then HeavyAttack()
 	else DoNothing()
