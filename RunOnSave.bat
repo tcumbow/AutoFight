@@ -1,1 +1,1 @@
-robocopy .\AutoFight A:\AutoFight
+robocopy .\AutoFight A:\AutoFight /mir

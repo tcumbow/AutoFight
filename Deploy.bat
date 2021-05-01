@@ -1,3 +1,3 @@
-robocopy .\AutoFight A:\AutoFight
-robocopy .\AutoFight S:\AutoFight
-robocopy .\AutoFight J:\AutoFight
+robocopy .\AutoFight A:\AutoFight /mir
+robocopy .\AutoFight S:\AutoFight /mir
+robocopy .\AutoFight J:\AutoFight /mir
