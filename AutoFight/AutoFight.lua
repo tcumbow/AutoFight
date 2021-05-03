@@ -508,6 +508,7 @@ end
 --#region CHARACTER-SPECIFIC CODE 01
 
 local BlockCostPerChar = {}
+local BlockMitigationPerChar = {}
 local AutoFight = {}
 
 BlockCostPerChar[GIDEON] = 2020
@@ -679,6 +680,7 @@ AutoFight[NISSA] = function ()
 end
 
 BlockCostPerChar["TEMPLATE"] = nil
+BlockMitigationPerChar["TEMPLATE"] = nil
 AutoFight["TEMPLATE"] = function ()
 	if TopPriorityAutoFight() then
 	elseif Health() < 80 then UseAbility(1)
@@ -695,6 +697,7 @@ end
 
 local function InitializeVariables()
 	BlockCost = BlockCostPerChar[CharName] or BlockCost
+	BlockMitigation = BlockMitigationPerChar[CharName] or BlockMitigation
 	ABB = ZO_SavedVars:NewAccountWide("ABB",0)
 	InitializeABBDataStructures()
 end
