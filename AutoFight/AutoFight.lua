@@ -628,7 +628,7 @@ AutoFight[KARRIE] = function ()
 	end
 end
 
-BlockCostPerChar[MINA] = 1670
+BlockCostPerChar[MINA] = 1369
 AutoFight[MINA] = function ()
 	if TopPriorityAutoFight() then
 	elseif PreAttackAutoFight() then
