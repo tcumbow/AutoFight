@@ -42,6 +42,10 @@ local Werewolf = IsWerewolf
 
 local GetUnitName = GetUnitName
 
+function FormatString(inputString)
+	return ZO_CachedStrFormat("<<C:1>>",inputString)
+end
+
 --#endregion
 
 --#region Info variables
@@ -384,8 +388,9 @@ local function WorstIncomingAttack(mustBeBlockable)
 	else return IncomingAttacksBySourceUnitId[keyOfWorstAttack]
 	end
 end
-local function OnEventCombatEvent( eventCode, result, isError, abilityName, abilityGraphic, abilityActionSlotType, sourceName, sourceType, targetName, targetType, hitValue, powerType, damageType, log, sourceUnitId, targetUnitId, abilityId )
-	local abilitySynId = sourceName.." "..abilityName
+local function OnEventCombatEvent( eventCode, result, isError, abilityName, abilityGraphic, abilityActionSlotType, sourceNameRaw, sourceType, targetName, targetType, hitValue, powerType, damageType, log, sourceUnitId, targetUnitId, abilityId )
+	local sourceName = FormatString(sourceNameRaw)
+	local abilitySynId = sourceName.."__"..abilityName
 	if targetType==COMBAT_UNIT_TYPE_PLAYER and sourceType~=COMBAT_UNIT_TYPE_PLAYER then
 		local now = Now()
 		if result==ACTION_RESULT_BEGIN then
@@ -698,7 +703,7 @@ end
 local function InitializeVariables()
 	BlockCost = BlockCostPerChar[CharName] or BlockCost
 	BlockMitigation = BlockMitigationPerChar[CharName] or BlockMitigation
-	ABB = ZO_SavedVars:NewAccountWide("ABB",0)
+	ABB = ZO_SavedVars:NewAccountWide("ABB",1)
 	InitializeABBDataStructures()
 end
 
