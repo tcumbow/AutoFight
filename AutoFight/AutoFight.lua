@@ -42,7 +42,7 @@ local Werewolf = IsWerewolf
 
 local GetUnitName = GetUnitName
 
-function FormatString(inputString)
+local function FormatString(inputString)
 	return ZO_CachedStrFormat("<<C:1>>",inputString)
 end
 
