@@ -411,12 +411,12 @@ local function OnEventCombatEvent( eventCode, result, isError, abilityName, abil
 			if result==ACTION_RESULT_DAMAGE then
 				if ABB.MaxRecordedDamagePerAbilitySynId[abilitySynId]==nil or hitValue > ABB.MaxRecordedDamagePerAbilitySynId[abilitySynId] then
 					ABB.MaxRecordedDamagePerAbilitySynId[abilitySynId] = hitValue
-					Print("AutoFight: new max damage recorded for: "..abilitySynId)
+					-- Print("AutoFight: new max damage recorded for: "..abilitySynId)
 				end
 			elseif result==ACTION_RESULT_BLOCKED_DAMAGE then
 				if ABB.CanBeBlockedPerAbilitySynId[abilitySynId] ~= true then
 					ABB.CanBeBlockedPerAbilitySynId[abilitySynId] = true
-					d("AutoFight: learned to block: "..abilitySynId)
+					-- d("AutoFight: learned to block: "..abilitySynId)
 				end
 			end
 		end
@@ -440,14 +440,24 @@ local function ShouldRollDodge()
 	local predictedDamage = ABB.MaxRecordedDamagePerAbilitySynId[worstIncomingAttack.AbilitySynId]
 	if predictedDamage == nil then return false end
 	local rollDodgeCost = RollDodgeCost()
-	return (StaminaPoints()>rollDodgeCost and (predictedDamage/HealthPoints())>(rollDodgeCost/StaminaPoints()))
+	if (StaminaPoints()>rollDodgeCost and (predictedDamage/HealthPoints())>(rollDodgeCost/StaminaPoints())) then
+		Print("Roll dodged "..worstIncomingAttack.AbilitySynId)
+		return true
+	else
+		return false
+	end
 end
 local function MustRollDodge()
 	local worstIncomingAttack = WorstIncomingAttack()
 	if worstIncomingAttack == nil then return false end
 	local predictedDamage = ABB.MaxRecordedDamagePerAbilitySynId[worstIncomingAttack.AbilitySynId]
 	if predictedDamage == nil then return false end
-	return ( StaminaPoints()>RollDodgeCost() and predictedDamage>HealthPoints() )
+	if ( StaminaPoints()>RollDodgeCost() and predictedDamage>HealthPoints() ) then
+		Print("Roll dodged "..worstIncomingAttack.AbilitySynId)
+		return true
+	else
+		return false
+	end
 end
 --#endregion
 
