@@ -613,7 +613,7 @@ AutoFight[HADARA] = function ()
 	elseif not IHave("Summon Volatile Familiar") then WeaveAbility(2)
 	elseif VolatilePulseReady() then WeaveAbility(2)
 	elseif not IHave("Major Sorcery") then WeaveAbility(3)
-	elseif UltimateReady() and TargetIsHostileNpc() and TargetIsMoreThanTrash() then UseUltimate()
+	elseif UltimateReady() and TargetIsHostileNpc() and TargetIsBoss() then UseUltimate()
 	elseif TargetIsHostileNpc() then WeaveAbility(1)
 	else DoNothing()
 	end
