@@ -379,7 +379,7 @@ local function WorstIncomingAttack(mustBeBlockable)
 	local biggestDamage = -1
 	for key, value in pairs(IncomingAttacksBySourceUnitId) do
 		local damageBeingExamined = ABB.MaxRecordedDamagePerAbilitySynId[value.AbilitySynId] or 0
-		if damageBeingExamined > biggestDamage and IncomingAttackIsAboutToHit(value) and (mustBeBlockable == nil or ABB.CanBeBlockedPerAbilitySynId[value.AbilitySynId] == true) then
+		if damageBeingExamined > biggestDamage and IncomingAttackIsAboutToHit(value) and (mustBeBlockable == nil or ABB.CanBeBlockedPerAbilitySynId[value.AbilitySynId] == true) and value.AbilitySynId ~= "Strangler__Choking Poison" and value.AbilitySynId ~= "Caillaoife__Wave of Earth" and value.AbilitySynId ~= "Forgotten Deadeye__Icy Salvo" and value.AbilitySynId ~= "Ghost__Double Strike" then
 			keyOfWorstAttack = key
 			biggestDamage = damageBeingExamined
 		end
