@@ -530,6 +530,7 @@ AutoFight[GIDEON] = function ()
 	if TopPriorityAutoFight() then
 	elseif Magicka()<15 and not Blocking() then HeavyAttack()
 	elseif LowestGroupHealthPercent()<40 then UseAbility(1)
+	-- elseif TargetName == "Gloom Wraith" then UseAbility(5)
 	elseif LowestGroupHealthPercent()<70 and Magicka()>70 then UseAbility(1)
 	elseif LowestGroupHealthPercentWithoutRegen()<80 then UseAbility(2)
 	elseif PreAttackAutoFight() then
