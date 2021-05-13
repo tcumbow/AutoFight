@@ -181,6 +181,9 @@ end
 --#endregion
 
 --#region Healer functions
+local function UnitCanBeHealed(unitTag)
+	return (IsUnitInGroupSupportRange(unitTag) and not IsUnitDead(unitTag) and GetUnitType(unitTag) == 1 and not DoesUnitHaveResurrectPending(unitTag))
+end
 local function LowestGroupHealthPercent()
 	local GroupSize = GetGroupSize()
 	local LowestGroupHealthPercent = 1.00
@@ -189,7 +192,7 @@ local function LowestGroupHealthPercent()
 			local unitTag = GetGroupUnitTagByIndex(i)
 			local currentHp, maxHp, effectiveMaxHp = GetUnitPower(unitTag, POWERTYPE_HEALTH)
 			local HpPercent = currentHp / maxHp
-			if HpPercent < LowestGroupHealthPercent and IsUnitInGroupSupportRange(unitTag) and not IsUnitDead(unitTag) and GetUnitType(unitTag) == 1 and not DoesUnitHaveResurrectPending(unitTag) then
+			if HpPercent < LowestGroupHealthPercent and UnitCanBeHealed(unitTag) then
 				LowestGroupHealthPercent = HpPercent
 			end
 		end
@@ -209,7 +212,7 @@ local function LowestGroupHealthPercentWithoutRegen()
 			local unitTag = GetGroupUnitTagByIndex(i)
 			local currentHp, maxHp, effectiveMaxHp = GetUnitPower(unitTag, POWERTYPE_HEALTH)
 			local HpPercent = currentHp / maxHp
-			if HpPercent < LowestGroupHealthPercent and not UnitHasRegen(unitTag) and IsUnitInGroupSupportRange(unitTag) and not IsUnitDead(unitTag) and GetUnitType(unitTag) == 1 and not DoesUnitHaveResurrectPending(unitTag) then
+			if HpPercent < LowestGroupHealthPercent and not UnitHasRegen(unitTag) and UnitCanBeHealed(unitTag) then
 				LowestGroupHealthPercent = HpPercent
 			end
 		end
