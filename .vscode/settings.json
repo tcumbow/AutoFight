@@ -95,7 +95,8 @@
         "DoesUnitHaveResurrectPending",
         "IsWerewolf",
         "POWERTYPE_WEREWOLF",
-        "ZO_CachedStrFormat"
+        "ZO_CachedStrFormat",
+        "IsUnitReincarnating"
     ],
     "cSpell.words": [
         "ANYA",

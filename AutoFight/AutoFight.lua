@@ -182,7 +182,7 @@ end
 
 --#region Healer functions
 local function UnitCanBeHealed(unitTag)
-	return (IsUnitInGroupSupportRange(unitTag) and not IsUnitDead(unitTag) and GetUnitType(unitTag) == 1 and not DoesUnitHaveResurrectPending(unitTag))
+	return (IsUnitInGroupSupportRange(unitTag) and not IsUnitDead(unitTag) and GetUnitType(unitTag) == 1 and not DoesUnitHaveResurrectPending(unitTag) and IsUnitReincarnating(unitTag))
 end
 local function LowestGroupHealthPercent()
 	local GroupSize = GetGroupSize()
