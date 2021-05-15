@@ -403,7 +403,7 @@ local function OnEventCombatEvent( eventCode, result, isError, abilityName, abil
 				SourceName = sourceName,
 				AbilitySynId = abilitySynId,
 				Timestamp = now }
-		elseif result==ACTION_RESULT_DAMAGE or result==ACTION_RESULT_BLOCKED_DAMAGE then
+		elseif result==ACTION_RESULT_DAMAGE or result==ACTION_RESULT_BLOCKED_DAMAGE or result==ACTION_RESULT_DODGED then
 			local correspondingIncomingAttack = IncomingAttacksBySourceUnitId[sourceUnitId]
 			if (correspondingIncomingAttack ~= nil and correspondingIncomingAttack.AbilitySynId==abilitySynId) then
 				local Lag = (now - correspondingIncomingAttack.Timestamp)
