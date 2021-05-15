@@ -232,7 +232,7 @@ local function SomeoneCouldUseRegen()
 		local GroupMembersInSupportRange = 0
 		for i = 1, GroupSize do
 			unitTag = GetGroupUnitTagByIndex(i)
-			if IsUnitInGroupSupportRange(unitTag) and not IsUnitDead(unitTag) and GetUnitType(unitTag) == 1 and not DoesUnitHaveResurrectPending(unitTag) then
+			if UnitCanBeHealed(unitTag) then
 				GroupMembersInSupportRange = GroupMembersInSupportRange + 1
 				if not UnitHasRegen(unitTag) then return true end
 				if UnitHasBuffTimeLeft(unitTag,"Radiating Regeneration",5000) then
