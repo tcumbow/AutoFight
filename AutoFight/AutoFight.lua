@@ -689,13 +689,18 @@ end
 BlockCostPerChar[NISSA] = nil
 AutoFight[NISSA] = function ()
 	if TopPriorityAutoFight() then
-	elseif Health()<60 and not IHave("Resolving Vigor") and StaminaPoints()>3000 then WeaveAbility(4)
+    elseif Health()<60 and MagickaPoints()>5000 then UseAbility(2)
+	elseif Health()<60 and not IHave("Resolving Vigor") and StaminaPoints()>3000 then WeaveAbility(5)
 	elseif PreAttackAutoFight() then
+	elseif TargetShouldBeTaunted() then WeaveAbility(4)
 	elseif UltimateReady() and TargetIsHostileNpc() and TargetIsMoreThanTrash() then UseUltimate()
-	elseif Stamina()<60 then HeavyAttack()
-	elseif TargetIsHostileNpc() and not TargetHas("Poison Injection") then WeaveAbility(2)
-	elseif TargetIsHostileNpc() and not TargetHas("Acid Spray") then WeaveAbility(3)
-	elseif TargetIsHostileNpc() then WeaveAbility(1)
+    elseif ActiveBar()==1 and Magicka()>99 then WeaveAbility(1)
+    elseif ActiveBar()==1 and not IHave("Major Resolve") and Magicka()>50 then WeaveAbility(3)
+	elseif ActiveBar()==2 and Stamina()<60 then HeavyAttack()
+	elseif ActiveBar()==2 and TargetIsHostileNpc() and not TargetHas("Poison Injection") then WeaveAbility(2)
+	elseif ActiveBar()==2 and TargetIsHostileNpc() and not TargetHas("Acid Spray") then WeaveAbility(3)
+	elseif ActiveBar()==2 and TargetIsHostileNpc() then WeaveAbility(1)
+    elseif TargetIsHostileNpc() and not Blocking() then HeavyAttack()
 	else DoNothing()
 	end
 end
