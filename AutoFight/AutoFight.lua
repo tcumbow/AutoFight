@@ -601,7 +601,7 @@ AutoFight[ELODIE] = function ()
 	if TopPriorityAutoFight() then
 	elseif PreAttackAutoFight() then
 	elseif UltimateReady() and TargetIsHostileNpc() and TargetIsMoreThanTrash() then UseUltimate()
-	elseif TargetIsHostileNpc() and Magicka()>15 then WeaveAbility(1)
+	elseif InMeleeRange and Magicka()>15 then WeaveAbility(1)
 	elseif not Blocking() then HeavyAttack()
 	else DoNothing()
 	end
