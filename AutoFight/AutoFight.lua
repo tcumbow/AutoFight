@@ -377,13 +377,21 @@ local function IncomingAttackIsAboutToHit(attack)
 	local incomingAttackETR = attack.Timestamp + maxRecordedLag
 	return (incomingAttackETA-300 < now and incomingAttackETR+300 > now)
 end
+local AbilitySynIdsToNeverBlockOrDodge = {
+    ["Attendant of Blood__Winter's Reach"] = true,
+    ["Strangler__Choking Poison"] = true,
+    ["Caillaoife__Wave of Earth"] = true,
+    ["Molag Kena__Shock Strike"] = true,
+    ["Forgotten Deadeye__Icy Salvo"] = true,
+    ["Ghost__Double Strike"] = true,
+}
 local THAT_IS_BLOCKABLE = 1
 local function WorstIncomingAttack(mustBeBlockable)
 	local keyOfWorstAttack
 	local biggestDamage = -1
 	for key, value in pairs(IncomingAttacksBySourceUnitId) do
 		local damageBeingExamined = ABB.MaxRecordedDamagePerAbilitySynId[value.AbilitySynId] or 0
-		if damageBeingExamined > biggestDamage and IncomingAttackIsAboutToHit(value) and (mustBeBlockable == nil or ABB.CanBeBlockedPerAbilitySynId[value.AbilitySynId] == true) and value.AbilitySynId ~= "Strangler__Choking Poison" and value.AbilitySynId ~= "Caillaoife__Wave of Earth" and value.AbilitySynId ~= "Forgotten Deadeye__Icy Salvo" and value.AbilitySynId ~= "Ghost__Double Strike" and value.AbilitySynId ~= "Molag Kena__Shock Strike" then
+		if damageBeingExamined > biggestDamage and IncomingAttackIsAboutToHit(value) and (mustBeBlockable == nil or ABB.CanBeBlockedPerAbilitySynId[value.AbilitySynId] == true) and AbilitySynIdsToNeverBlockOrDodge[value.AbilitySynId] == nil then
 			keyOfWorstAttack = key
 			biggestDamage = damageBeingExamined
 		end
