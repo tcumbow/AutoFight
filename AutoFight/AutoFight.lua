@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-global
 --#region COMMON CODE 01
 
 --#region Constants
