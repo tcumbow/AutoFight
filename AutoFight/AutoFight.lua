@@ -382,7 +382,7 @@ local function WorstIncomingAttack(mustBeBlockable)
 	local biggestDamage = -1
 	for key, value in pairs(IncomingAttacksBySourceUnitId) do
 		local damageBeingExamined = ABB.MaxRecordedDamagePerAbilitySynId[value.AbilitySynId] or 0
-		if damageBeingExamined > biggestDamage and IncomingAttackIsAboutToHit(value) and (mustBeBlockable == nil or ABB.CanBeBlockedPerAbilitySynId[value.AbilitySynId] == true) and value.AbilitySynId ~= "Strangler__Choking Poison" and value.AbilitySynId ~= "Caillaoife__Wave of Earth" and value.AbilitySynId ~= "Forgotten Deadeye__Icy Salvo" and value.AbilitySynId ~= "Ghost__Double Strike" and value.AbilitySynId ~= "Molag Kena__Shock Strike" then
+		if damageBeingExamined > biggestDamage and IncomingAttackIsAboutToHit(value) and (mustBeBlockable == nil or ABB.CanBeBlockedPerAbilitySynId[value.AbilitySynId] == true) and value.AbilitySynId ~= "Strangler__Choking Poison" and value.AbilitySynId ~= "Caillaoife__Wave of Earth" and value.AbilitySynId ~= "Forgotten Deadeye__Icy Salvo" and value.AbilitySynId ~= "Ghost__Double Strike" and value.AbilitySynId ~= "Molag Kena__Shock Strike" and value.AbilitySynId ~= "Mochveda__Wake of Frost" then
 			keyOfWorstAttack = key
 			biggestDamage = damageBeingExamined
 		end
@@ -542,7 +542,8 @@ AutoFight[GIDEON] = function ()
 	elseif LowestGroupHealthPercentWithoutRegen()<90 then WeaveAbility(2)
 	-- elseif InMeleeRange and Magicka()>80 then WeaveAbility(5)
 	elseif SomeoneCouldUseRegen() and Magicka()>50 then WeaveAbility(2)
-    elseif Magicka()>99 then WeaveAbility(5)
+	elseif Magicka()>50 and not IHave("Dampen Magic") then WeaveAbility(5)
+	elseif TargetIsHostileNpc() and not Blocking() and Magicka()>90 then LightAttack()
 	elseif TargetIsHostileNpc() and not Blocking() then HeavyAttack()
 	else DoNothing()
 	end
