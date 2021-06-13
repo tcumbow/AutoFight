@@ -550,9 +550,10 @@ AutoFight[GIDEON] = function ()
 	elseif PreAttackAutoFight() then
 	-- elseif UltimateReady() and TargetIsHostileNpc() then UseUltimate()
 	elseif LowestGroupHealthPercentWithoutRegen()<90 then WeaveAbility(2)
-	-- elseif InMeleeRange and Magicka()>80 then WeaveAbility(5)
+	-- elseif InMeleeRange and Magicka()>30 then WeaveAbility(4)
+	elseif not IHave("Major Resolve") and Magicka()>40 then WeaveAbility(5)
 	elseif SomeoneCouldUseRegen() and Magicka()>50 then WeaveAbility(2)
-	elseif Magicka()>95 then WeaveAbility(5)
+	elseif Magicka()>99 then WeaveAbility(4)
 	-- elseif TargetIsHostileNpc() and not Blocking() and Magicka()>90 then LightAttack()
 	elseif TargetIsHostileNpc() and not Blocking() then HeavyAttack()
 	else DoNothing()
@@ -678,8 +679,12 @@ AutoFight[ANYA] = function ()
 	if TopPriorityAutoFight() then
 	elseif PreAttackAutoFight() then
 	elseif UltimateReady() and TargetIsHostileNpc() and TargetIsMoreThanTrash() then UseUltimate()
+	elseif ActiveBar()==1 and Health()<60 and not IHave("Resolving Vigor") and StaminaPoints()>3000 then WeaveAbility(2)
 	elseif not IHave("Skeletal Archer") and Stamina() > 50 then WeaveAbility(4)
-	elseif TargetIsHostileNpc() and not Blocking() then HeavyAttack()
+	elseif ActiveBar()==2 and TargetIsHostileNpc() and not TargetHas("Poison Injection") then WeaveAbility(2)
+	elseif ActiveBar()==2 and TargetIsHostileNpc() and not TargetHas("Acid Spray") then WeaveAbility(3)
+	elseif TargetIsHostileNpc() and Stamina()>50 then WeaveAbility(1)
+    elseif TargetIsHostileNpc() and not Blocking() then HeavyAttack()
 	else DoNothing()
 	end
 end
