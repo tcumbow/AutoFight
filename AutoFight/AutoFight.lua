@@ -16,6 +16,7 @@ local NISSA = "Nissa Forbus"
 local ANYA = "Anya Romaine"
 local MINA = "Mina Copperton"
 local KARRIE = "Karrie Lumin"
+local CORA = "Cora Siidyn"
 local CROWN_TRI_POTION = "Crown Tri-Restoration Potion"
 --#endregion
 
@@ -555,6 +556,22 @@ AutoFight[GIDEON] = function ()
 	elseif SomeoneCouldUseRegen() and Magicka()>50 then WeaveAbility(2)
 	elseif Magicka()>99 then WeaveAbility(4)
 	-- elseif TargetIsHostileNpc() and not Blocking() and Magicka()>90 then LightAttack()
+	elseif TargetIsHostileNpc() and not Blocking() then HeavyAttack()
+	else DoNothing()
+	end
+end
+
+BlockCostPerChar[CORA] = 1435
+AutoFight[CORA] = function ()
+	if TopPriorityAutoFight() then
+	elseif Stamina()<15 and not Blocking() then HeavyAttack()
+	elseif PreAttackAutoFight() then
+	elseif UltimateReady() and TargetIsHostileNpc() then UseUltimate()
+	elseif not IHave("Major Savagery") then WeaveAbility(1)
+	elseif not IHave("Major Brutality") then WeaveAbility(2)
+	elseif TargetIsHostileNpc() and not TargetHas("Growing Swarm") and Stamina()>50 then WeaveAbility(5)
+	elseif TargetIsHostileNpc() and not Blocking() and Stamina()>80 then WeaveAbility(4)
+	elseif TargetIsHostileNpc() and not Blocking() and Stamina()>90 then LightAttack()
 	elseif TargetIsHostileNpc() and not Blocking() then HeavyAttack()
 	else DoNothing()
 	end
