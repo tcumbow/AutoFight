@@ -100,7 +100,7 @@ local function UnitHasRegen(unitTag)
 	if numBuffs > 0 then
 		for i = 1, numBuffs do
 			local name, _, _, _, _, _, _, _, _, _, _, _ = GetUnitBuffInfo(unitTag, i)
-			if name=="Rapid Regeneration" or name=="Radiating Regeneration" then
+			if name=="Rapid Regeneration" or name=="Radiating Regeneration" or name=="Echoing Vigor" then --TODO Vigor needs to be split out into it's own function
 				return true
 			end
 		end
@@ -565,13 +565,15 @@ BlockCostPerChar[CORA] = 1435
 AutoFight[CORA] = function ()
 	if TopPriorityAutoFight() then
 	elseif Stamina()<15 and not Blocking() then HeavyAttack()
+	elseif LowestGroupHealthPercentWithoutRegen()<60 then UseAbility(3)
 	elseif PreAttackAutoFight() then
+	elseif not IHave("Major Resolve") then WeaveAbility(4)
 	elseif UltimateReady() and TargetIsHostileNpc() then UseUltimate()
 	elseif not IHave("Major Savagery") then WeaveAbility(1)
 	elseif not IHave("Major Brutality") then WeaveAbility(2)
 	elseif TargetIsHostileNpc() and not TargetHas("Growing Swarm") and Stamina()>50 then WeaveAbility(5)
-	elseif TargetIsHostileNpc() and not Blocking() and Stamina()>80 then WeaveAbility(4)
-	elseif TargetIsHostileNpc() and not Blocking() and Stamina()>90 then LightAttack()
+	-- elseif TargetIsHostileNpc() and not Blocking() and Stamina()>70 then WeaveAbility(4)
+	elseif TargetIsHostileNpc() and not Blocking() and Stamina()>80 then LightAttack()
 	elseif TargetIsHostileNpc() and not Blocking() then HeavyAttack()
 	else DoNothing()
 	end
