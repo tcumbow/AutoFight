@@ -562,6 +562,7 @@ AutoFight[GIDEON] = function ()
 end
 
 BlockCostPerChar[CORA] = 1435
+BlockMitigationPerChar[CORA] = 0.53
 AutoFight[CORA] = function ()
 	if TopPriorityAutoFight() then
 	elseif Stamina()<15 and not Blocking() then HeavyAttack()
